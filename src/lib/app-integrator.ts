@@ -12,6 +12,7 @@ export class AppIntegrator {
     private readonly runCommand: CommandWrap,
     private readonly clearHistoryCommand: CommandWrap,
     private readonly createQuickCommand: (n: number) => CommandWrap,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private readonly vscode: any,
   ) {}
 

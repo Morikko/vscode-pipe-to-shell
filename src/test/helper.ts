@@ -1,16 +1,18 @@
 import * as td from "testdouble";
-import * as assert from "assert";
-import { ObjectMap } from "../lib/types/collection";
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mock<T>(c: new (...args: any[]) => T): T {
   return new (td.constructor(c))();
 }
-
-export function mockType<T>(params?: any): T {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function mockType<T extends object>(params?: any): T {
   return Object.assign({} as T, params);
 }
 
-export function mockMethods<T>(methods: string[], params?: any): T {
+export function mockMethods<T extends object>(
+  methods: string[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  params?: Record<string, any>,
+): T {
   return Object.assign(td.object(methods) as T, params);
 }
 

@@ -13,7 +13,7 @@ import { ExtensionCommand } from "./commands/extension-command";
 import { CommandWrap } from "./command-wrap";
 import { RunQuickCommand } from "./commands/run-quick";
 
-const childProcess = require("child_process");
+import * as childProcess from "child_process";
 
 export class AppIntegratorFactory {
   private readonly cache: {
@@ -80,7 +80,7 @@ export class AppIntegratorFactory {
       new ProcessRunner(),
       this.workspaceAdapter,
       process,
-      childProcess,
+      childProcess.spawn,
     );
   }
 

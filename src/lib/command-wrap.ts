@@ -22,7 +22,11 @@ export class CommandWrap {
     try {
       await this.command.execute(editor && this.wrapEditor(editor));
     } catch (e) {
-      this.handleError(e);
+      if (e instanceof Error) {
+        this.handleError(e);
+      } else {
+        throw e;
+      }
     }
   }
 

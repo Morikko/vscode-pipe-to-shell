@@ -61,6 +61,7 @@ describe("Editor", () => {
     );
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function fakeEditor(params: any) {
     const selectedTexts = params.selectedTexts || [];
     const entireText = `FOO\n${selectedTexts[0] || ""}\nBAR`;
@@ -84,6 +85,7 @@ describe("Editor", () => {
           ),
         }),
       },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       edit: function (callback: any) {
         callback(params.editBuilder || { replace: () => {} });
         return Promise.resolve(true);

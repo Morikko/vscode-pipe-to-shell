@@ -22,7 +22,6 @@ export class ProcessRunner {
       });
       command.on("close", (code) => {
         if (code !== 0) {
-          // @ts-ignore `spawnargs` is not declared on ChildProcess class. Private property?
           const commandString = command.spawnargs.slice(-1)[0];
           reject(
             new CommandExecutionError(

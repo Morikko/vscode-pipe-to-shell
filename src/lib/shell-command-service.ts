@@ -1,17 +1,15 @@
 import { ProcessRunner } from "./process-runner";
 import { ShellCommandExecContext } from "./shell-command-exec-context";
 import { ShellSettingsResolver } from "./shell-settings-resolver";
-import { ChildProcess, SpawnOptions } from "child_process";
+import { ChildProcess, SpawnOptionsWithoutStdio } from "child_process";
 import { Workspace } from "./adapters/workspace";
 import Process = NodeJS.Process;
 
-export interface SpawnWrapper {
-  spawn: (
-    command: string,
-    args?: ReadonlyArray<string>,
-    options?: SpawnOptions,
-  ) => ChildProcess;
-}
+export type SpawnWrapper = (
+  command: string,
+  args?: ReadonlyArray<string>,
+  options?: SpawnOptionsWithoutStdio,
+) => ChildProcess;
 
 export interface CommandParams {
   command: string;
@@ -27,7 +25,7 @@ export class ShellCommandService {
     private readonly processRunner: ProcessRunner,
     workspace: Workspace,
     process: Process,
-    private readonly childProcess: SpawnWrapper,
+    private readonly spawn_child_process: SpawnWrapper,
   ) {
     this.shellCommandExecContext = new ShellCommandExecContext(workspace, {
       env: process.env,
@@ -42,7 +40,7 @@ export class ShellCommandService {
     const options = this.getOptions(params);
     const shell = this.shellSettingsResolver.shellProgramme();
     const shellArgs = this.shellSettingsResolver.shellArgs();
-    const command = this.childProcess.spawn(
+    const command = this.spawn_child_process(
       shell,
       [...shellArgs, params.command],
       options,

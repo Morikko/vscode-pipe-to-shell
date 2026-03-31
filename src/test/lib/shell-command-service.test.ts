@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import { any, contains, mock, mockMethods, mockType, when } from "../helper";
+import { any, contains, mock, mockFunction, mockType, when } from "../helper";
 import {
   ShellCommandService,
   SpawnWrapper,
@@ -11,7 +11,7 @@ import { EXTENSION_NAME } from "../../lib/const";
 import Process = NodeJS.Process;
 
 describe("ShellCommandService", () => {
-  let childProcess: SpawnWrapper;
+  let spawn_child_process: SpawnWrapper;
   let processRunner: ProcessRunner;
   let service: ShellCommandService;
   const currentPath = "CURRENT_DIR/CURRENT_FILE";
@@ -20,26 +20,26 @@ describe("ShellCommandService", () => {
   beforeEach(() => {
     const process = mockType<ChildProcess>();
 
-    childProcess = mockMethods(["spawn"]);
+    spawn_child_process = mockFunction() as SpawnWrapper;
     when(
-      childProcess.spawn("SHELL_PATH", ["SHELL_ARG", "COMMAND_STRING"], any()),
+      spawn_child_process("SHELL_PATH", ["SHELL_ARG", "COMMAND_STRING"], any()),
     ).thenReturn(process);
     when(
-      childProcess.spawn(
+      spawn_child_process(
         "SHELL_PATH",
         ["SHELL_ARG", "COMMAND_TEST_WITH_ENVVARS"],
         contains({ env: { SOME_ENV_VAR: "..." } }),
       ),
     ).thenReturn(process);
     when(
-      childProcess.spawn(
+      spawn_child_process(
         "SHELL_PATH",
         ["SHELL_ARG", "COMMAND_TEST_WITH_EXPOSE_INPUT_AS_ENVVAR"],
         contains({ env: { ES_SELECTED: "SELECTED_TEXT" } }),
       ),
     ).thenReturn(process);
     when(
-      childProcess.spawn(
+      spawn_child_process(
         "SHELL_PATH",
         ["SHELL_ARG", "COMMAND_TEST_WITH_EXEC_DIR"],
         contains({ cwd: "CURRENT_DIR" }),
@@ -73,7 +73,7 @@ describe("ShellCommandService", () => {
         platform,
         env: { SOME_ENV_VAR: "..." },
       }),
-      childProcess,
+      spawn_child_process,
     );
   });
 
@@ -132,7 +132,11 @@ describe("ShellCommandService", () => {
       await service.runCommand(params);
       throw new Error("Should not have been called");
     } catch (e) {
-      assert.deepStrictEqual(e.message, "UNEXPECTED_ERROR");
+      if (e instanceof Error) {
+        assert.deepStrictEqual(e.message, "UNEXPECTED_ERROR");
+      } else {
+        throw e;
+      }
     }
   });
 });

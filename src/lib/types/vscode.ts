@@ -1,4 +1,5 @@
 export interface ExecutionContextLike {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   subscriptions: any[];
 }
 

@@ -26,6 +26,7 @@ describe("WorkspaceAdapter", () => {
       "C.D.E.F": "VALUE2",
     } as ObjectMap<string | undefined>;
     return mockType<typeof vscode.workspace>({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       getConfiguration: (oneAbove: any) => {
         switch (oneAbove) {
           case "A":
