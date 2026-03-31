@@ -34,7 +34,9 @@ export class CommandWrap {
     this.logger.error(e.stack);
 
     const sourceMessage =
-      e instanceof CommandExecutionError ? e.errorOutput : e.message;
+      e instanceof CommandExecutionError && e.errorOutput.length > 0
+        ? e.errorOutput
+        : e.message;
     const errorMessage = this.errorMessageFormatter.format(sourceMessage);
     await this.showErrorMessage(errorMessage);
   }

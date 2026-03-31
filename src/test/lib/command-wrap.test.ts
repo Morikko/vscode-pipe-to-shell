@@ -13,6 +13,7 @@ import { ShowErrorMessage } from "../../lib/types/vscode";
 import * as vscode from "vscode";
 import { CommandWrap } from "../../lib/command-wrap";
 import { ExtensionCommand } from "../../lib/commands/extension-command";
+import { CommandExecutionError } from "../../lib/errors/command";
 
 describe("CommandWrap", () => {
   let logger: Logger;
@@ -35,7 +36,7 @@ describe("CommandWrap", () => {
     showErrorMessage = mockFunction() as ShowErrorMessage;
 
     command = mockMethods<ExtensionCommand>(["execute"]);
-    when(command.execute(badEditor)).thenThrow(new Error("UNEXPECTED_ERROR"));
+    when(command.execute(badEditor)).thenReject(new Error("UNEXPECTED_ERROR"));
 
     commandWrap = new CommandWrap(
       command,
@@ -54,7 +55,36 @@ describe("CommandWrap", () => {
   it("reports an error", async () => {
     await commandWrap.execute(rowBadEditor);
 
-    verify(showErrorMessage(contains("UNEXPECTED\\_ERROR")));
+    verify(showErrorMessage(contains("UNEXPECTED_ERROR")));
     verify(logger.error(contains("Error: UNEXPECTED_ERROR")));
+  });
+
+  it("reports a CommandExecutionError using errorOutput", async () => {
+    const commandError = new CommandExecutionError(
+      "Command failed",
+      1,
+      "test-command",
+      "COMMAND_ERROR_OUTPUT",
+    );
+    when(command.execute(badEditor)).thenReject(commandError);
+
+    await commandWrap.execute(rowBadEditor);
+
+    verify(showErrorMessage(contains("COMMAND_ERROR_OUTPUT")));
+    verify(logger.error(contains("Error: Command failed")));
+  });
+
+  it("reports a CommandExecutionError using messsage for empty errorOutput", async () => {
+    const commandError = new CommandExecutionError(
+      "Command failed",
+      1,
+      "test-command",
+      "",
+    );
+    when(command.execute(badEditor)).thenReject(commandError);
+
+    await commandWrap.execute(rowBadEditor);
+
+    verify(showErrorMessage(contains("Command failed")));
   });
 });
