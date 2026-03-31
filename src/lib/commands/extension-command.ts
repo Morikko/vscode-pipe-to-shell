@@ -1,5 +1,5 @@
-import {Editor} from '../adapters/editor';
+import { Editor } from "../adapters/editor";
 
 export interface ExtensionCommand {
-    execute(editor?: Editor): Promise<void>;
+  execute(editor?: Editor): Promise<void>;
 }

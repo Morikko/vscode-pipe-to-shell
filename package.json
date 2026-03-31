@@ -190,7 +190,9 @@
     "watch": "tsc -watch -p ./",
     "prep": "yarn run lint && yarn run compile && yarn test",
     "vscode:prepublish": "yarn run compile",
-    "vscode:postpublish": "./tag-release.sh"
+    "vscode:postpublish": "./tag-release.sh",
+    "format": "prettier --write src/",
+    "format:check": "prettier --check src/"
   },
   "devDependencies": {
     "@types/mocha": "^8.0.4",
@@ -200,6 +202,7 @@
     "@vscode/test-electron": "^2.3.0",
     "mocha": "^8.2.1",
     "nyc": "^15.1.0",
+    "prettier": "^3.8.1",
     "testdouble": "^3.13.1",
     "ts-node": "^9.0.0",
     "tslint": "^6.1.3",

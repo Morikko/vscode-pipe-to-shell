@@ -1,4 +1,3 @@
-
 export type ObjectMap<T> = {
-    [p: string]: T;
+  [p: string]: T;
 };

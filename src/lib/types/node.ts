@@ -1,5 +1,5 @@
-import {ObjectMap} from './collection';
+import { ObjectMap } from "./collection";
 
 export interface EnvVarWrap {
-    env: ObjectMap<string | undefined>;
+  env: ObjectMap<string | undefined>;
 }

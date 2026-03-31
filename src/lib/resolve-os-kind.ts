@@ -1,9 +1,9 @@
-import {ObjectMap} from './types/collection';
+import { ObjectMap } from "./types/collection";
 
 const OS_KIND = {
-    darwin: 'osx',
-    linux: 'linux',
-    win32: 'windows'
+  darwin: "osx",
+  linux: "linux",
+  win32: "windows",
 } as ObjectMap<string>;
 const DEFAULT_OS_KIND = OS_KIND.linux;
 

@@ -1,16 +1,17 @@
-
 export interface ExecutionContextLike {
-    subscriptions: any[];
+  subscriptions: any[];
 }
 
 export interface PositionLike {
-    line: number;
-    character: number;
+  line: number;
+  character: number;
 }
 
 export interface RangeLike {
-    start: PositionLike;
-    end: PositionLike;
+  start: PositionLike;
+  end: PositionLike;
 }
 
-export type ShowErrorMessage = (message: string) => Thenable<string | undefined>;
+export type ShowErrorMessage = (
+  message: string,
+) => Thenable<string | undefined>;

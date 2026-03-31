@@ -1,4 +1,3 @@
-
 export interface Logger {
-    error(...args: any[]): void;
+  error(...args: any[]): void;
 }
