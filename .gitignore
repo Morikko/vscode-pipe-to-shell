@@ -6,3 +6,4 @@ yarn-*.log
 /out
 *.vsix
 __*
+.vscode-test
