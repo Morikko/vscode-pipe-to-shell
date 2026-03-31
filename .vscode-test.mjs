@@ -6,4 +6,5 @@ export default defineConfig({
         ui: 'bdd',
         timeout: 20000
     },
+    version: "1.113.0"
 });

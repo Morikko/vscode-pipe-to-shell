@@ -19,6 +19,7 @@ describe("CommandReader", () => {
         placeHolder:
           "Select a command to reuse or Cancel (Esc) to write a new command",
       }),
+      // @ts-expect-error interface issue
     ).thenResolve("COMMAND_1");
     when(
       vscodeWindow.showInputBox({
@@ -26,6 +27,7 @@ describe("CommandReader", () => {
         prompt: "Edit the command if necessary",
         value: "COMMAND_1",
       }),
+      // @ts-expect-error interface issue
     ).thenResolve("COMMAND_FINAL");
     const reader = new CommandReader(historyStore, vscodeWindow);
     const command = await reader.read();
@@ -43,6 +45,7 @@ describe("CommandReader", () => {
         placeHolder: "Enter a command",
         prompt: "No history available yet",
       }),
+      // @ts-expect-error interface issue
     ).thenResolve("COMMAND");
     const historyStore = mockType<HistoryStore>({ getAll: () => [] });
     const reader = new CommandReader(historyStore, vscodeWindow);
@@ -61,6 +64,7 @@ describe("CommandReader", () => {
     });
     when(
       vscodeWindow.showInputBox({ placeHolder: "Enter a command" }),
+      // @ts-expect-error interface issue
     ).thenResolve("COMMAND");
 
     const historyStore = mockType<HistoryStore>({
