@@ -4,8 +4,11 @@ import { Editor } from "../../../lib/adapters/editor";
 import { ShellCommandService } from "../../../lib/shell-command-service";
 import { HistoryStore } from "../../../lib/history-store";
 import { any, mock, mockMethods, verify, when } from "../../helper";
+import * as vscode from "vscode";
 
 describe("RunQuickCommand", () => {
+  const fileUri = vscode.Uri.file("FILE_NAME");
+
   describe('When command is specified and "processEntireTextIfNoneSelected" is set to "false"', () => {
     const workspaceAdapter = mockMethods<Workspace>(["getConfig"]);
     when(
@@ -30,14 +33,14 @@ describe("RunQuickCommand", () => {
         shellCommandService.runCommand({
           command: "COMMAND_STRING",
           input: "SELECTED_TEXT",
-          filePath: "FILE_NAME",
+          fileUri: fileUri,
         }),
       ).thenResolve("COMMAND_OUTPUT_1");
       when(
         shellCommandService.runCommand({
           command: "COMMAND_STRING",
           input: "",
-          filePath: "FILE_NAME",
+          fileUri: fileUri,
         }),
       ).thenResolve("COMMAND_OUTPUT_2");
 
@@ -55,7 +58,7 @@ describe("RunQuickCommand", () => {
         isTextSelected: true,
         selectedTexts: ["SELECTED_TEXT"],
         entireText: "ENTIRE_TEXT",
-        filePath: "FILE_NAME",
+        fileUri: fileUri,
       });
 
       await command.execute(editor);
@@ -69,7 +72,7 @@ describe("RunQuickCommand", () => {
         isTextSelected: false,
         selectedTexts: [""],
         entireText: "ENTIRE_TEXT",
-        filePath: "FILE_NAME",
+        fileUri: fileUri,
       });
 
       await command.execute(editor);
@@ -102,14 +105,14 @@ describe("RunQuickCommand", () => {
         shellCommandService.runCommand({
           command: "COMMAND_STRING",
           input: "SELECTED_TEXT",
-          filePath: "FILE_NAME",
+          fileUri: fileUri,
         }),
       ).thenResolve("COMMAND_OUTPUT_1");
       when(
         shellCommandService.runCommand({
           command: "COMMAND_STRING",
           input: "ENTIRE_TEXT",
-          filePath: "FILE_NAME",
+          fileUri: fileUri,
         }),
       ).thenResolve("COMMAND_OUTPUT_2");
 
@@ -127,7 +130,7 @@ describe("RunQuickCommand", () => {
         isTextSelected: true,
         selectedTexts: ["SELECTED_TEXT"],
         entireText: "ENTIRE_TEXT",
-        filePath: "FILE_NAME",
+        fileUri: fileUri,
       });
 
       await command.execute(editor);
@@ -140,7 +143,7 @@ describe("RunQuickCommand", () => {
         isTextSelected: false,
         selectedTexts: [""],
         entireText: "ENTIRE_TEXT",
-        filePath: "FILE_NAME",
+        fileUri: fileUri,
       });
 
       await command.execute(editor);

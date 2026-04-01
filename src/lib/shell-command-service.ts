@@ -3,6 +3,8 @@ import { ShellCommandExecContext } from "./shell-command-exec-context";
 import { ShellSettingsResolver } from "./shell-settings-resolver";
 import { ChildProcess, SpawnOptionsWithoutStdio } from "child_process";
 import { Workspace } from "./adapters/workspace";
+import * as vscode from "vscode";
+
 import Process = NodeJS.Process;
 
 export type SpawnWrapper = (
@@ -14,7 +16,7 @@ export type SpawnWrapper = (
 export interface CommandParams {
   command: string;
   input: string;
-  filePath?: string;
+  fileUri: vscode.Uri;
 }
 
 export class ShellCommandService {
@@ -50,7 +52,7 @@ export class ShellCommandService {
 
   private getOptions(params: CommandParams) {
     return {
-      cwd: this.shellCommandExecContext.getCwd(params.filePath),
+      cwd: this.shellCommandExecContext.getCwd(params.fileUri),
       env: {
         ...this.shellCommandExecContext.env,
         ES_SELECTED: params.input,

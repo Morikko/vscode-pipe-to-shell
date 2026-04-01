@@ -18,7 +18,26 @@ export class Workspace {
     };
   }
 
-  get rootPath() {
-    return this.vsWorkspace.rootPath;
+  /**
+   * @param fileUri
+   * @returns The workspace path the fileUri belongs to if any
+   */
+  getRootPathFor(fileUri: vscode.Uri): string | undefined {
+    const folder = this.vsWorkspace.getWorkspaceFolder(fileUri);
+    if (folder) {
+      return folder.uri.fsPath;
+    }
+    return undefined;
+  }
+
+  /**
+   * @returns The first workspace folder path if existing
+   */
+  getDefaultRootPath(): string | undefined {
+    const folders = this.vsWorkspace.workspaceFolders;
+    if (folders != undefined && folders.length > 0) {
+      return folders[0].uri.fsPath;
+    }
+    return undefined;
   }
 }

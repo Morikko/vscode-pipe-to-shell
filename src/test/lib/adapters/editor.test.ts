@@ -23,13 +23,19 @@ describe("Editor", () => {
   it("holds a file path", () => {
     const vsEditor = fakeEditor({ uriScheme: "file" });
     const editor = new Editor(vsEditor, locationFactory);
-    assert.deepStrictEqual(editor.filePath, "FILE_PATH");
+    assert.deepStrictEqual(editor.fileUri, {
+      scheme: "file",
+      fsPath: "FILE_PATH",
+    });
   });
 
   it("does not hold a file path if editor content has never been saved", () => {
     const vsEditor = fakeEditor({});
     const editor = new Editor(vsEditor, locationFactory);
-    assert.strictEqual(typeof editor.filePath, "undefined");
+    assert.deepStrictEqual(editor.fileUri, {
+      scheme: "untitled",
+      fsPath: undefined,
+    });
   });
 
   it("replaces the selected text with given text", async () => {
@@ -75,7 +81,7 @@ describe("Editor", () => {
         getText: () => selectedTexts[0] || entireText,
         uri: {
           scheme: uriScheme || "untitled",
-          fsPath: "FILE_PATH",
+          fsPath: uriScheme ? "FILE_PATH" : undefined,
         },
         lineCount: entireText.split("\n").length,
         lineAt: (lineIndex: number) => ({

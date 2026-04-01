@@ -9,12 +9,14 @@ import { ChildProcess } from "child_process";
 import { Workspace } from "../../lib/adapters/workspace";
 import { EXTENSION_NAME } from "../../lib/const";
 import Process = NodeJS.Process;
+import * as vscode from "vscode";
 
 describe("ShellCommandService", () => {
   let spawn_child_process: SpawnWrapper;
   let processRunner: ProcessRunner;
   let service: ShellCommandService;
-  const currentPath = "CURRENT_DIR/CURRENT_FILE";
+  const fileUri = vscode.Uri.file("CURRENT_DIR/CURRENT_FILE");
+  const untitledUri = vscode.Uri.from({ scheme: "untitled" });
   const platform = "linux";
 
   beforeEach(() => {
@@ -78,7 +80,11 @@ describe("ShellCommandService", () => {
   });
 
   it("runs a given command on shell", async () => {
-    const params = { command: "COMMAND_STRING", input: "" };
+    const params = {
+      command: "COMMAND_STRING",
+      input: "",
+      fileUri: untitledUri,
+    };
     const output = await service.runCommand(params);
 
     assert.deepStrictEqual(output, "COMMAND_OUTPUT");
@@ -88,6 +94,7 @@ describe("ShellCommandService", () => {
     const params = {
       command: "COMMAND_STRING",
       input: "SELECTED_TEXT",
+      fileUri: untitledUri,
     };
     const output = await service.runCommand(params);
 
@@ -95,7 +102,11 @@ describe("ShellCommandService", () => {
   });
 
   it("inherits environment variables on executing a command", async () => {
-    const params = { command: "COMMAND_TEST_WITH_ENVVARS", input: "" };
+    const params = {
+      command: "COMMAND_TEST_WITH_ENVVARS",
+      input: "",
+      fileUri: untitledUri,
+    };
     const output = await service.runCommand(params);
 
     assert.deepStrictEqual(output, "COMMAND_OUTPUT");
@@ -105,6 +116,7 @@ describe("ShellCommandService", () => {
     const params = {
       command: "COMMAND_TEST_WITH_EXPOSE_INPUT_AS_ENVVAR",
       input: "SELECTED_TEXT",
+      fileUri: untitledUri,
     };
     const output = await service.runCommand(params);
 
@@ -115,7 +127,7 @@ describe("ShellCommandService", () => {
     const params = {
       command: "COMMAND_TEST_WITH_EXEC_DIR",
       input: "",
-      filePath: currentPath,
+      fileUri: fileUri,
     };
     const output = await service.runCommand(params);
 
@@ -126,6 +138,7 @@ describe("ShellCommandService", () => {
     const params = {
       command: "COMMAND_STRING",
       input: "CAUSE_ERROR_INPUT",
+      fileUri: untitledUri,
     };
 
     try {

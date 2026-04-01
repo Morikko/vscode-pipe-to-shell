@@ -1,4 +1,9 @@
-import { Position, Range, TextEditor as VsTextEditor } from "vscode";
+import {
+  Position,
+  Range,
+  TextEditor as VsTextEditor,
+  Uri as VsUri,
+} from "vscode";
 
 export type WrapEditor = (editor: VsTextEditor, lf?: LocationFactory) => Editor;
 
@@ -28,9 +33,8 @@ export class Editor {
     return this.selectedTexts.length > 1 || this.selectedTexts[0] !== "";
   }
 
-  get filePath(): string | undefined {
-    const uri = this.vsEditor.document.uri;
-    return uri.scheme === "file" ? uri.fsPath : undefined;
+  get fileUri(): VsUri {
+    return this.vsEditor.document.uri;
   }
 
   replaceSelectedTextsWith(texts: string[]) {

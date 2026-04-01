@@ -5,8 +5,11 @@ import { ShellCommandService } from "../../../lib/shell-command-service";
 import { HistoryStore } from "../../../lib/history-store";
 import { any, mock, mockMethods, mockType, verify, when } from "../../helper";
 import { CommandReader } from "../../../lib/command-reader";
+import * as vscode from "vscode";
 
 describe("RunInputCommand", () => {
+  const fileUri = vscode.Uri.file("FILE_NAME");
+
   describe('When command is specified and "processEntireTextIfNoneSelected" is set to "false"', () => {
     const commandReader = mockType<CommandReader>({
       read: () => Promise.resolve("COMMAND_STRING"),
@@ -26,14 +29,14 @@ describe("RunInputCommand", () => {
         shellCommandService.runCommand({
           command: "COMMAND_STRING",
           input: "SELECTED_TEXT",
-          filePath: "FILE_NAME",
+          fileUri: fileUri,
         }),
       ).thenResolve("COMMAND_OUTPUT_1");
       when(
         shellCommandService.runCommand({
           command: "COMMAND_STRING",
           input: "",
-          filePath: "FILE_NAME",
+          fileUri: fileUri,
         }),
       ).thenResolve("COMMAND_OUTPUT_2");
 
@@ -51,7 +54,7 @@ describe("RunInputCommand", () => {
         isTextSelected: true,
         selectedTexts: ["SELECTED_TEXT"],
         entireText: "ENTIRE_TEXT",
-        filePath: "FILE_NAME",
+        fileUri: fileUri,
       });
 
       await command.execute(editor);
@@ -65,7 +68,7 @@ describe("RunInputCommand", () => {
         isTextSelected: false,
         selectedTexts: [""],
         entireText: "ENTIRE_TEXT",
-        filePath: "FILE_NAME",
+        fileUri: fileUri,
       });
 
       await command.execute(editor);
@@ -93,14 +96,14 @@ describe("RunInputCommand", () => {
         shellCommandService.runCommand({
           command: "COMMAND_STRING",
           input: "SELECTED_TEXT",
-          filePath: "FILE_NAME",
+          fileUri: fileUri,
         }),
       ).thenResolve("COMMAND_OUTPUT_1");
       when(
         shellCommandService.runCommand({
           command: "COMMAND_STRING",
           input: "ENTIRE_TEXT",
-          filePath: "FILE_NAME",
+          fileUri: fileUri,
         }),
       ).thenResolve("COMMAND_OUTPUT_2");
 
@@ -118,7 +121,7 @@ describe("RunInputCommand", () => {
         isTextSelected: true,
         selectedTexts: ["SELECTED_TEXT"],
         entireText: "ENTIRE_TEXT",
-        filePath: "FILE_NAME",
+        fileUri: fileUri,
       });
 
       await command.execute(editor);
@@ -131,7 +134,7 @@ describe("RunInputCommand", () => {
         isTextSelected: false,
         selectedTexts: [""],
         entireText: "ENTIRE_TEXT",
-        filePath: "FILE_NAME",
+        fileUri: fileUri,
       });
 
       await command.execute(editor);

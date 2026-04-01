@@ -2,6 +2,8 @@ import { EXTENSION_NAME } from "./const";
 import { Workspace } from "./adapters/workspace";
 import { EnvVarWrap } from "./types/node";
 import { dirname } from "path";
+import * as os from "os";
+import * as vscode from "vscode";
 
 enum CurrentDirectoryKind {
   CURRENT_FILE = "currentFile",
@@ -18,21 +20,30 @@ export class ShellCommandExecContext {
     return this.process.env;
   }
 
-  getCwd(filePath?: string) {
+  /**
+   * 1. For an existing file
+   *  1. The file directory (CURRENT_FILE)
+   *  2. The workspace folder root the file is part of (WORKSPACE_ROOT)
+   * 2. First workspace folder root if existing
+   * 3. Default to Home directory
+   */
+  getCwd(fileUri: vscode.Uri): string {
     const configPath = `${EXTENSION_NAME}.currentDirectoryKind`;
     const currentDirectoryKind =
       this.workspaceAdapter.getConfig<CurrentDirectoryKind>(configPath);
-    switch (currentDirectoryKind) {
-      case CurrentDirectoryKind.CURRENT_FILE:
-        return filePath ? dirname(filePath) : this.env.HOME;
 
-      case CurrentDirectoryKind.WORKSPACE_ROOT:
-        return this.workspaceAdapter.rootPath || this.env.HOME;
+    if (fileUri.scheme == "file") {
+      if (currentDirectoryKind == CurrentDirectoryKind.CURRENT_FILE) {
+        return dirname(fileUri.fsPath);
+      }
 
-      default:
-        throw new Error(
-          `Unknown currentDirectoryKind: ${currentDirectoryKind}`,
-        );
+      const root_folder = this.workspaceAdapter.getRootPathFor(fileUri);
+
+      if (root_folder) {
+        return root_folder;
+      }
     }
+
+    return this.workspaceAdapter.getDefaultRootPath() || os.homedir();
   }
 }

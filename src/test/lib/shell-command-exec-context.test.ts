@@ -3,8 +3,14 @@ import { mockMethods, mockType, when } from "../helper";
 
 import { ShellCommandExecContext } from "../../lib/shell-command-exec-context";
 import { Workspace } from "../../lib/adapters/workspace";
+import * as vscode from "vscode";
+import * as os from "os";
 
 describe("ShellCommandExecContext", () => {
+  const fileUri = vscode.Uri.file("/DIR/FILE");
+  const untitledUri = vscode.Uri.from({ scheme: "untitled" });
+  const WORKSPACE_ROOT = "PROJECT_ROOT_PATH";
+
   it("has environment variables", () => {
     const workspace = mockType<Workspace>();
     const execContext = new ShellCommandExecContext(workspace, {
@@ -13,46 +19,74 @@ describe("ShellCommandExecContext", () => {
     assert.deepStrictEqual(execContext.env, { VAR: ".." });
   });
 
-  it('returns the directory of the current file if currentDirectoryKind is set to "currentFile"', () => {
-    const execContext = new ShellCommandExecContext(
-      fakeWorkspaceAdapter("currentFile"),
-      { env: {} },
-    );
-    assert.deepStrictEqual(execContext.getCwd("DIR/FILE"), "DIR");
+  describe("with CurrentDirectoryKind.CURRENT_FILE mode", () => {
+    it("returns the directory of the current file if file is existing", () => {
+      const execContext = new ShellCommandExecContext(
+        fakeWorkspaceAdapter("currentFile"),
+        { env: {} },
+      );
+      assert.deepStrictEqual(execContext.getCwd(fileUri), "/DIR");
+    });
+
+    it("returns the workspace first root if file is not existing", () => {
+      const execContext = new ShellCommandExecContext(
+        fakeWorkspaceAdapter("currentFile", "DEFAULT_ROOT"),
+        { env: {} },
+      );
+      assert.deepStrictEqual(execContext.getCwd(untitledUri), "DEFAULT_ROOT");
+    });
+
+    it("returns the home dir if there is not even a workspace", () => {
+      const execContext = new ShellCommandExecContext(
+        fakeWorkspaceAdapter("currentFile"),
+        { env: {} },
+      );
+      //when(execContext.home_dir).thenReturn("HOME_DIR");
+      assert.deepStrictEqual(execContext.getCwd(untitledUri), os.homedir());
+    });
   });
 
-  it('returns user\'s home directory if currentDirectoryKind is set to "currentFile" but not available', () => {
-    const execContext = new ShellCommandExecContext(
-      fakeWorkspaceAdapter("currentFile"),
-      { env: { HOME: "USER_HOME_DIR" } },
-    );
-    assert.deepStrictEqual(execContext.getCwd(), "USER_HOME_DIR");
-  });
+  describe("with CurrentDirectoryKind.WORKSPACE_ROOT mode", () => {
+    it("returns the workspace root the file belongs in if any", () => {
+      const execContext = new ShellCommandExecContext(
+        fakeWorkspaceAdapter("workspaceRoot"),
+        { env: {} },
+      );
+      assert.deepStrictEqual(execContext.getCwd(fileUri), WORKSPACE_ROOT);
+    });
 
-  it('returns project root directory if currentDirectoryKind is set to "workspaceRoot"', () => {
-    const execContext = new ShellCommandExecContext(
-      fakeWorkspaceAdapter("workspaceRoot", "PROJECT_ROOT_PATH"),
-      { env: {} },
-    );
-    assert.deepStrictEqual(execContext.getCwd(), "PROJECT_ROOT_PATH");
-  });
+    it('returns first workspace root for untitled file"', () => {
+      const execContext = new ShellCommandExecContext(
+        fakeWorkspaceAdapter("workspaceRoot", "DEFAULT_ROOT"),
+        { env: {} },
+      );
+      assert.deepStrictEqual(execContext.getCwd(untitledUri), "DEFAULT_ROOT");
+    });
 
-  it('returns user\'s home directory if currentDirectoryKind is set to "workspaceRoot" but not available', () => {
-    const execContext = new ShellCommandExecContext(
-      fakeWorkspaceAdapter("workspaceRoot"),
-      { env: { HOME: "USER_HOME_DIR" } },
-    );
-    assert.deepStrictEqual(execContext.getCwd(), "USER_HOME_DIR");
+    it("returns home directory if no workspace", () => {
+      const execContext = new ShellCommandExecContext(
+        fakeWorkspaceAdapter("workspaceRoot"),
+        { env: {} },
+      );
+      assert.deepStrictEqual(execContext.getCwd(untitledUri), os.homedir());
+    });
   });
 
   function fakeWorkspaceAdapter(
     currentDirectoryKind: string,
-    rootPath?: string,
+    defaultRootPath?: string,
   ) {
-    const workspace = mockMethods<Workspace>(["getConfig"], { rootPath });
+    const workspace = mockMethods<Workspace>([
+      "getConfig",
+      "getRootPathFor",
+      "getDefaultRootPath",
+    ]);
     when(workspace.getConfig("editWithShell.currentDirectoryKind")).thenReturn(
       currentDirectoryKind,
     );
+    when(workspace.getRootPathFor(fileUri)).thenReturn(WORKSPACE_ROOT);
+    when(workspace.getRootPathFor(untitledUri)).thenReturn(undefined);
+    when(workspace.getDefaultRootPath()).thenReturn(defaultRootPath);
     return workspace;
   }
 });
