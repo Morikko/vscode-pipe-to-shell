@@ -11,7 +11,6 @@ export class AppIntegrator {
   constructor(
     private readonly runCommand: CommandWrap,
     private readonly clearHistoryCommand: CommandWrap,
-    private readonly createQuickCommand: (n: number) => CommandWrap,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private readonly vscode: any,
   ) {}
@@ -47,10 +46,6 @@ export class AppIntegrator {
         id: `${EXTENSION_NAME}.runCommand`,
         command: this.runCommand,
       },
-      ...[1, 2, 3, 4, 5].map((n) => ({
-        id: `${EXTENSION_NAME}.runQuickCommand${n}`,
-        command: this.createQuickCommand(n),
-      })),
     ];
   }
 }

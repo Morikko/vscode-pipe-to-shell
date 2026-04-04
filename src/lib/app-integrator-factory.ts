@@ -11,7 +11,6 @@ import * as vscode from "vscode";
 import { Position, Range, TextEditor as VsTextEditor } from "vscode";
 import { ExtensionCommand } from "./commands/extension-command";
 import { CommandWrap } from "./command-wrap";
-import { RunQuickCommand } from "./commands/run-quick";
 
 import * as childProcess from "child_process";
 
@@ -26,12 +25,7 @@ export class AppIntegratorFactory {
   }
 
   create() {
-    return new AppIntegrator(
-      this.runCommand,
-      this.clearHistoryCommand,
-      this.createQuickCommand,
-      vscode,
-    );
+    return new AppIntegrator(this.runCommand, this.clearHistoryCommand, vscode);
   }
 
   private get runCommand() {
@@ -43,18 +37,6 @@ export class AppIntegratorFactory {
         this.workspaceAdapter,
       ),
     );
-  }
-
-  private get createQuickCommand() {
-    return (commandNumber: number) =>
-      this.wrapCommand(
-        new RunQuickCommand(
-          this.shellCommandService,
-          this.historyStore,
-          this.workspaceAdapter,
-          commandNumber,
-        ),
-      );
   }
 
   private get clearHistoryCommand() {

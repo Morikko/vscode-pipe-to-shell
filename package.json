@@ -27,12 +27,7 @@
   ],
   "activationEvents": [
     "onCommand:editWithShell.clearCommandHistory",
-    "onCommand:editWithShell.runCommand",
-    "onCommand:editWithShell.runQuickCommand1",
-    "onCommand:editWithShell.runQuickCommand2",
-    "onCommand:editWithShell.runQuickCommand3",
-    "onCommand:editWithShell.runQuickCommand4",
-    "onCommand:editWithShell.runQuickCommand5"
+    "onCommand:editWithShell.runCommand"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -45,31 +40,6 @@
       {
         "command": "editWithShell.runCommand",
         "title": "Run command",
-        "category": "EditWithShell"
-      },
-      {
-        "command": "editWithShell.runQuickCommand1",
-        "title": "Run quick command 1",
-        "category": "EditWithShell"
-      },
-      {
-        "command": "editWithShell.runQuickCommand2",
-        "title": "Run quick command 2",
-        "category": "EditWithShell"
-      },
-      {
-        "command": "editWithShell.runQuickCommand3",
-        "title": "Run quick command 3",
-        "category": "EditWithShell"
-      },
-      {
-        "command": "editWithShell.runQuickCommand4",
-        "title": "Run quick command 4",
-        "category": "EditWithShell"
-      },
-      {
-        "command": "editWithShell.runQuickCommand5",
-        "title": "Run quick command 5",
         "category": "EditWithShell"
       }
     ],
@@ -86,28 +56,8 @@
           ],
           "default": "currentFile"
         },
-        "editWithShell.quickCommand1": {
-          "description": "ID of a favorite command triggered by quick command 1",
-          "type": "string"
-        },
-        "editWithShell.quickCommand2": {
-          "description": "ID of a favorite command triggered by quick command 2",
-          "type": "string"
-        },
-        "editWithShell.quickCommand3": {
-          "description": "ID of a favorite command triggered by quick command 3",
-          "type": "string"
-        },
-        "editWithShell.quickCommand4": {
-          "description": "ID of a favorite command triggered by quick command 4",
-          "type": "string"
-        },
-        "editWithShell.quickCommand5": {
-          "description": "ID of a favorite command triggered by quick command 5",
-          "type": "string"
-        },
         "editWithShell.favoriteCommands": {
-          "description": "Commands that can be activated by quick commands",
+          "description": "Favorite commands always shown in the suggestion",
           "type": "array",
           "items": {
             "type": "object",

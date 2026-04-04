@@ -11,7 +11,6 @@ Leverage your favourite shell commands to edit text.
 * Insert the output of shell commands at the cursor position.
 * Records command history: you can edit and reuse past commands.
 * Use the shell you like. For example, if you have Bash on Windows, you can specify Bash as your shell for this extension.
-* Register up to 5 quick commands that can be invoked by keyboard shortcuts.
 * Support multi cursors.
 
 ![Edit with Shell Command](https://raw.githubusercontent.com/ryu1kn/vscode-edit-with-shell/master/images/animations/public.gif)
@@ -39,10 +38,6 @@ A couple of requests from me when you raise an github issue.
 
     Clear command history
 
-* `EditWithShell: Run quick command 1` (**Command ID:** `editWithShell.runQuickCommand1`)
-
-    Run quick command 1. **You have quick commands up to 5**, i.e. `editWithShell.runQuickCommand5`
-
 ## Configurations
 
 * `editWithShell.currentDirectoryKind` (default: `"currentFile"`)
@@ -55,7 +50,8 @@ A couple of requests from me when you raise an github issue.
 
 * `editWithShell.favoriteCommands` (default: `[]`)
 
-    List of commands that can be activated by quick commands. Each element must have a command ID and command. e.g:
+    List of commands that are always shown in the suggestion. Each element must
+    have a command ID and command. e.g:
 
     ```
     "editWithShell.favoriteCommands": [
@@ -70,12 +66,6 @@ A couple of requests from me when you raise an github issue.
       ...
     ]
     ```
-
-* `editWithShell.quickCommand1` (default: `""`)
-
-    ID of a favorite command triggered with quick command 1. e.g. `"insert-melbourne-time"` of `favoriteCommands` config value example.
-
-    **You have quick commands up to 5**, i.e. `editWithShell.quickCommand5`.
 
 * `editWithShell.shell.linux` (default: `"/bin/sh"`)
 
@@ -113,8 +103,6 @@ You can quickly open a command input box by registering the extension command to
 
 ```
   { "key": "ctrl+r ctrl+r", "command": "editWithShell.runCommand",
-                            "when": "editorTextFocus && !editorReadonly" },
-  { "key": "ctrl+r ctrl+1", "command": "editWithShell.runQuickCommand1",
                             "when": "editorTextFocus && !editorReadonly" },
 ```
 
