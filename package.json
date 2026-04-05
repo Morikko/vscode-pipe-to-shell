@@ -38,8 +38,13 @@
         "category": "EditWithShell"
       },
       {
-        "command": "editWithShell.runCommand",
-        "title": "Run command",
+        "command": "editWithShell.runCommandInPlace",
+        "title": "Run command inplace",
+        "category": "EditWithShell"
+      },
+      {
+        "command": "editWithShell.runCommandNewEditor",
+        "title": "Run command in new editor",
         "category": "EditWithShell"
       }
     ],

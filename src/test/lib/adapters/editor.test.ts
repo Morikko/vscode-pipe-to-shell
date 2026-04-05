@@ -3,13 +3,20 @@ import { mockMethods, mockType, verify } from "../../helper";
 
 import { Editor } from "../../../lib/adapters/editor";
 import * as vscode from "vscode";
-import { Position, Range } from "vscode";
+import { Position } from "vscode";
 
 describe("Editor", () => {
-  const locationFactory = { createPosition, createRange };
+  const locationFactory = { createPosition, createRange: createSelection };
+  const partialSelection = new vscode.Selection(
+    new vscode.Position(10, 0),
+    new vscode.Position(12, 2),
+  );
 
   it("holds a selected text", () => {
-    const vsEditor = fakeEditor({ selectedTexts: ["SELECTED_TEXT"] });
+    const vsEditor = fakeEditor({
+      selectedTexts: ["SELECTED_TEXT"],
+      selections: [partialSelection],
+    });
     const editor = new Editor(vsEditor, locationFactory);
     assert.deepStrictEqual(editor.selectedTexts, ["SELECTED_TEXT"]);
   });
@@ -42,11 +49,12 @@ describe("Editor", () => {
     const editBuilder = mockMethods<vscode.TextEditorEdit>(["replace"]);
     const vsEditor = fakeEditor({
       selectedTexts: ["SELECTED_TEXT"],
+      selections: [partialSelection],
       editBuilder,
     });
     const editor = new Editor(vsEditor, locationFactory);
 
-    await editor.replaceSelectedTextsWith(["NEW_TEXT"]);
+    await editor.replaceSelectedTextsWith([partialSelection], ["NEW_TEXT"]);
 
     verify(editBuilder.replace(vsEditor.selections[0], "NEW_TEXT"));
   });
@@ -54,14 +62,17 @@ describe("Editor", () => {
   it("replaces the entire text with the command output", async () => {
     const editBuilder = mockMethods<vscode.TextEditorEdit>(["replace"]);
     const vsEditor = fakeEditor({ editBuilder });
-    const locationFactory = { createPosition, createRange };
+    const locationFactory = { createPosition, createRange: createSelection };
     const editor = new Editor(vsEditor, locationFactory);
 
-    await editor.replaceEntireTextWith("NEW_TEXT");
+    await editor.replaceSelectedTextsWith(
+      [createSelection(createPosition(0, 0), createPosition(2, 24))],
+      ["NEW_TEXT"],
+    );
 
     verify(
       editBuilder.replace(
-        createRange(createPosition(0, 0), createPosition(2, 24)),
+        createSelection(createPosition(0, 0), createPosition(2, 24)),
         "NEW_TEXT",
       ),
     );
@@ -73,10 +84,7 @@ describe("Editor", () => {
     const entireText = `FOO\n${selectedTexts[0] || ""}\nBAR`;
     const uriScheme = params.uriScheme;
     return mockType<vscode.TextEditor>({
-      selections: selectedTexts.map((text: string) => ({
-        text,
-        isEmpty: !text,
-      })),
+      selections: params.selections,
       document: {
         getText: () => selectedTexts[0] || entireText,
         uri: {
@@ -85,7 +93,7 @@ describe("Editor", () => {
         },
         lineCount: entireText.split("\n").length,
         lineAt: (lineIndex: number) => ({
-          range: createRange(
+          range: createSelection(
             createPosition(lineIndex, 0),
             createPosition(lineIndex, 24),
           ),
@@ -100,13 +108,10 @@ describe("Editor", () => {
   }
 
   function createPosition(line: number, column: number) {
-    return mockType<Position>({ line, column });
+    return new vscode.Position(line, column);
   }
 
-  function createRange(position1: Position, position2: Position) {
-    return mockType<Range>({
-      start: position1,
-      end: position2,
-    });
+  function createSelection(position1: Position, position2: Position) {
+    return new vscode.Selection(position1, position2);
   }
 });

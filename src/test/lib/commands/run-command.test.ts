@@ -1,4 +1,4 @@
-import { RunInputCommand } from "../../../lib/commands/run-input";
+import { RunCommand } from "../../../lib/commands/run-command";
 import { Workspace } from "../../../lib/adapters/workspace";
 import { Editor } from "../../../lib/adapters/editor";
 import { ShellCommandService } from "../../../lib/shell-command-service";
@@ -7,8 +7,16 @@ import { any, mock, mockMethods, mockType, verify, when } from "../../helper";
 import { CommandReader } from "../../../lib/command-reader";
 import * as vscode from "vscode";
 
-describe("RunInputCommand", () => {
+describe("RunCommand", () => {
   const fileUri = vscode.Uri.file("FILE_NAME");
+  const partialSelection = new vscode.Selection(
+    new vscode.Position(10, 0),
+    new vscode.Position(12, 2),
+  );
+  const fullSelection = new vscode.Selection(
+    new vscode.Position(0, 0),
+    new vscode.Position(12, 20),
+  );
 
   describe('When command is specified and "processEntireTextIfNoneSelected" is set to "false"', () => {
     const commandReader = mockType<CommandReader>({
@@ -21,7 +29,7 @@ describe("RunInputCommand", () => {
 
     let shellCommandService: ShellCommandService;
     let historyStore: HistoryStore;
-    let command: RunInputCommand;
+    let command: RunCommand;
 
     beforeEach(() => {
       shellCommandService = mock(ShellCommandService);
@@ -41,11 +49,12 @@ describe("RunInputCommand", () => {
       ).thenResolve("COMMAND_OUTPUT_2");
 
       historyStore = mock(HistoryStore);
-      command = new RunInputCommand(
+      command = new RunCommand(
         shellCommandService,
         commandReader,
         historyStore,
         workspaceAdapter,
+        true,
       );
     });
 
@@ -53,13 +62,19 @@ describe("RunInputCommand", () => {
       const editor = mockMethods<Editor>(["replaceSelectedTextsWith"], {
         isTextSelected: true,
         selectedTexts: ["SELECTED_TEXT"],
+        selections: [partialSelection],
         entireText: "ENTIRE_TEXT",
         fileUri: fileUri,
       });
 
       await command.execute(editor);
 
-      verify(editor.replaceSelectedTextsWith(["COMMAND_OUTPUT_1"]));
+      verify(
+        editor.replaceSelectedTextsWith(
+          [partialSelection],
+          ["COMMAND_OUTPUT_1"],
+        ),
+      );
       verify(historyStore.add("COMMAND_STRING"));
     });
 
@@ -67,13 +82,19 @@ describe("RunInputCommand", () => {
       const editor = mockMethods<Editor>(["replaceSelectedTextsWith"], {
         isTextSelected: false,
         selectedTexts: [""],
+        selections: [partialSelection],
         entireText: "ENTIRE_TEXT",
         fileUri: fileUri,
       });
 
       await command.execute(editor);
 
-      verify(editor.replaceSelectedTextsWith(["COMMAND_OUTPUT_2"]));
+      verify(
+        editor.replaceSelectedTextsWith(
+          [partialSelection],
+          ["COMMAND_OUTPUT_2"],
+        ),
+      );
     });
   });
 
@@ -88,7 +109,7 @@ describe("RunInputCommand", () => {
 
     let shellCommandService: ShellCommandService;
     let historyStore: HistoryStore;
-    let command: RunInputCommand;
+    let command: RunCommand;
 
     beforeEach(() => {
       shellCommandService = mock(ShellCommandService);
@@ -108,11 +129,12 @@ describe("RunInputCommand", () => {
       ).thenResolve("COMMAND_OUTPUT_2");
 
       historyStore = mock(HistoryStore);
-      command = new RunInputCommand(
+      command = new RunCommand(
         shellCommandService,
         commandReader,
         historyStore,
         workspaceAdapter,
+        true,
       );
     });
 
@@ -120,26 +142,37 @@ describe("RunInputCommand", () => {
       const editor = mockMethods<Editor>(["replaceSelectedTextsWith"], {
         isTextSelected: true,
         selectedTexts: ["SELECTED_TEXT"],
+        selections: [partialSelection],
         entireText: "ENTIRE_TEXT",
+        entireSelection: [fullSelection],
         fileUri: fileUri,
       });
 
       await command.execute(editor);
 
-      verify(editor.replaceSelectedTextsWith(["COMMAND_OUTPUT_1"]));
+      verify(
+        editor.replaceSelectedTextsWith(
+          [partialSelection],
+          ["COMMAND_OUTPUT_1"],
+        ),
+      );
     });
 
     it("runs command with entire text", async () => {
-      const editor = mockMethods<Editor>(["replaceEntireTextWith"], {
+      const editor = mockMethods<Editor>(["replaceSelectedTextsWith"], {
         isTextSelected: false,
         selectedTexts: [""],
+        selections: [partialSelection],
         entireText: "ENTIRE_TEXT",
+        entireSelection: [fullSelection],
         fileUri: fileUri,
       });
 
       await command.execute(editor);
 
-      verify(editor.replaceEntireTextWith("COMMAND_OUTPUT_2"));
+      verify(
+        editor.replaceSelectedTextsWith([fullSelection], ["COMMAND_OUTPUT_2"]),
+      );
     });
   });
 
@@ -148,16 +181,17 @@ describe("RunInputCommand", () => {
       const historyStore = mock(HistoryStore);
       const shellCommandService = mock(ShellCommandService);
       const editor = mock(Editor);
-      const command = new RunInputCommand(
+      const command = new RunCommand(
         shellCommandService,
         mockType<CommandReader>({ read: () => Promise.resolve() }),
         historyStore,
         mockType<Workspace>(),
+        true,
       );
 
       await command.execute(editor);
 
-      verify(editor.replaceSelectedTextsWith(any()), { times: 0 });
+      verify(editor.replaceSelectedTextsWith(any(), any()), { times: 0 });
       verify(shellCommandService.runCommand(any()), { times: 0 });
       verify(historyStore.add(any()), { times: 0 });
     });

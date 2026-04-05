@@ -9,7 +9,9 @@
       "request": "launch",
       "name": "My extension tests",
       "testConfiguration": "${workspaceFolder}/.vscode-test.mjs",
-	    "args": ["--extensionDevelopmentPath=${workspaceFolder}"]
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}"
+      ]
     },
     {
       "type": "extensionHost",

@@ -4,7 +4,7 @@ import { ShellCommandService } from "./shell-command-service";
 import { CommandReader } from "./command-reader";
 import { HistoryStore } from "./history-store";
 import { ProcessRunner } from "./process-runner";
-import { RunInputCommand } from "./commands/run-input";
+import { RunCommand } from "./commands/run-command";
 import { ClearHistoryCommand } from "./commands/clear-history";
 import { Workspace as WorkspaceAdapter } from "./adapters/workspace";
 import * as vscode from "vscode";
@@ -25,16 +25,34 @@ export class AppIntegratorFactory {
   }
 
   create() {
-    return new AppIntegrator(this.runCommand, this.clearHistoryCommand, vscode);
+    return new AppIntegrator(
+      this.runCommandInPlace,
+      this.runCommandNewEditor,
+      this.clearHistoryCommand,
+      vscode,
+    );
   }
 
-  private get runCommand() {
+  private get runCommandInPlace() {
     return this.wrapCommand(
-      new RunInputCommand(
+      new RunCommand(
         this.shellCommandService,
         new CommandReader(this.historyStore, vscode.window),
         this.historyStore,
         this.workspaceAdapter,
+        true,
+      ),
+    );
+  }
+
+  private get runCommandNewEditor() {
+    return this.wrapCommand(
+      new RunCommand(
+        this.shellCommandService,
+        new CommandReader(this.historyStore, vscode.window),
+        this.historyStore,
+        this.workspaceAdapter,
+        false,
       ),
     );
   }

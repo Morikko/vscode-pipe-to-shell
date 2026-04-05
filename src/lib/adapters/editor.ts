@@ -5,6 +5,8 @@ import {
   Uri as VsUri,
 } from "vscode";
 
+import * as vscode from "vscode";
+
 export type WrapEditor = (editor: VsTextEditor, lf?: LocationFactory) => Editor;
 
 export interface LocationFactory {
@@ -25,8 +27,24 @@ export class Editor {
     );
   }
 
+  get selections(): readonly vscode.Selection[] {
+    return this.vsEditor.selections;
+  }
+
   get entireText(): string {
     return this.vsEditor.document.getText();
+  }
+
+  get entireSelection(): readonly vscode.Selection[] {
+    const document = this.vsEditor.document;
+    const lineCount = document.lineCount;
+    const lastLine = document.lineAt(lineCount - 1);
+    return [
+      new vscode.Selection(
+        this.locationFactory.createPosition(0, 0),
+        lastLine.range.end,
+      ),
+    ];
   }
 
   get isTextSelected(): boolean {
@@ -37,26 +55,28 @@ export class Editor {
     return this.vsEditor.document.uri;
   }
 
-  replaceSelectedTextsWith(texts: string[]) {
+  replaceSelectedTextsWith(
+    selections: readonly vscode.Selection[],
+    texts: string[],
+  ) {
     const editor = this.vsEditor;
     return editor.edit((editBuilder) => {
-      editor.selections.forEach((selection, index) => {
+      selections.forEach((selection, index) => {
         editBuilder.replace(selection, texts[index]);
       });
     });
   }
 
-  replaceEntireTextWith(text: string) {
-    const editor = this.vsEditor;
-    const document = editor.document;
-    const lineCount = document.lineCount;
-    const lastLine = document.lineAt(lineCount - 1);
-    const entireRange = this.locationFactory.createRange(
-      this.locationFactory.createPosition(0, 0),
-      lastLine.range.end,
-    );
-    return editor.edit((editBuilder) => {
-      editBuilder.replace(entireRange, text);
+  async openNewEditor(content: string): Promise<vscode.TextEditor> {
+    return new Promise((resolve, reject) => {
+      vscode.workspace
+        .openTextDocument({ content: content, language: "" })
+        .then(
+          (doc) => {
+            resolve(vscode.window.showTextDocument(doc));
+          },
+          (err) => reject(err),
+        );
     });
   }
 }

@@ -2,14 +2,10 @@ import { EXTENSION_NAME } from "./const";
 import { ExecutionContextLike } from "./types/vscode";
 import { CommandWrap } from "./command-wrap";
 
-interface CommandHandlerInfo {
-  id: string;
-  command: CommandWrap;
-}
-
 export class AppIntegrator {
   constructor(
-    private readonly runCommand: CommandWrap,
+    private readonly runCommandInPlace: CommandWrap,
+    private readonly runCommandNewEditor: CommandWrap,
     private readonly clearHistoryCommand: CommandWrap,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private readonly vscode: any,
@@ -17,35 +13,28 @@ export class AppIntegrator {
 
   integrate(context: ExecutionContextLike) {
     this.registerCommands(context);
-    this.registerTextEditorCommands(context);
   }
 
   private registerCommands(context: ExecutionContextLike) {
-    const disposable = this.vscode.commands.registerCommand(
+    const clearCommandHistory = this.vscode.commands.registerCommand(
       `${EXTENSION_NAME}.clearCommandHistory`,
       this.clearHistoryCommand.execute,
       this.clearHistoryCommand,
     );
-    context.subscriptions.push(disposable);
-  }
+    context.subscriptions.push(clearCommandHistory);
 
-  private registerTextEditorCommands(context: ExecutionContextLike): void {
-    this.textEditorCommands.forEach((command) => {
-      const disposable = this.vscode.commands.registerTextEditorCommand(
-        command.id,
-        command.command.execute,
-        command.command,
-      );
-      context.subscriptions.push(disposable);
-    });
-  }
+    const runCommandInPlace = this.vscode.commands.registerTextEditorCommand(
+      `${EXTENSION_NAME}.runCommandInPlace`,
+      this.runCommandInPlace.execute,
+      this.runCommandInPlace,
+    );
+    context.subscriptions.push(runCommandInPlace);
 
-  private get textEditorCommands(): CommandHandlerInfo[] {
-    return [
-      {
-        id: `${EXTENSION_NAME}.runCommand`,
-        command: this.runCommand,
-      },
-    ];
+    const runCommandNewEditor = this.vscode.commands.registerTextEditorCommand(
+      `${EXTENSION_NAME}.runCommandNewEditor`,
+      this.runCommandNewEditor.execute,
+      this.runCommandNewEditor,
+    );
+    context.subscriptions.push(runCommandNewEditor);
   }
 }

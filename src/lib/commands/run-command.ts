@@ -4,15 +4,17 @@ import { HistoryStore } from "../history-store";
 import { Workspace } from "../adapters/workspace";
 import { Editor } from "../adapters/editor";
 import { ExtensionCommand } from "./extension-command";
+import { CommandReader } from "../command-reader";
+import * as vscode from "vscode";
 
-export abstract class RunCommand implements ExtensionCommand {
+export class RunCommand implements ExtensionCommand {
   constructor(
     private readonly shellCommandService: ShellCommandService,
+    private readonly commandReader: CommandReader,
     private readonly historyStore: HistoryStore,
     private readonly workspaceAdapter: Workspace,
+    private readonly inplace: boolean,
   ) {}
-
-  protected abstract getCommandText(): Promise<string | undefined>;
 
   async execute(wrappedEditor: Editor) {
     const command = await this.getCommandText();
@@ -20,35 +22,38 @@ export abstract class RunCommand implements ExtensionCommand {
 
     this.historyStore.add(command);
 
+    let inputTexts: string[];
+    let selections: readonly vscode.Selection[];
     if (this.shouldPassEntireText(wrappedEditor)) {
-      await this.processEntireText(command, wrappedEditor);
+      inputTexts = [wrappedEditor.entireText];
+      selections = wrappedEditor.entireSelection;
     } else {
-      await this.processSelectedTexts(command, wrappedEditor);
+      inputTexts = wrappedEditor.selectedTexts;
+      selections = wrappedEditor.selections;
+    }
+
+    const commandOutputs = await this.processSelectedTexts(
+      command,
+      inputTexts,
+      wrappedEditor.fileUri,
+    );
+
+    if (this.inplace) {
+      await wrappedEditor.replaceSelectedTextsWith(selections, commandOutputs);
+    } else {
+      await wrappedEditor.openNewEditor(commandOutputs.join("\n\n"));
     }
   }
 
   private async processSelectedTexts(
     command: string,
-    wrappedEditor: Editor,
-  ): Promise<void> {
-    const fileUri = wrappedEditor.fileUri;
-    const promiseOfCommandOutputs = wrappedEditor.selectedTexts.map((input) =>
+    selectedTexts: string[],
+    fileUri: vscode.Uri,
+  ): Promise<string[]> {
+    const promiseOfCommandOutputs = selectedTexts.map((input) =>
       this.shellCommandService.runCommand({ command, input, fileUri }),
     );
-    const commandOutputs = await Promise.all(promiseOfCommandOutputs);
-    await wrappedEditor.replaceSelectedTextsWith(commandOutputs);
-  }
-
-  private async processEntireText(
-    command: string,
-    wrappedEditor: Editor,
-  ): Promise<void> {
-    const commandOutput = await this.shellCommandService.runCommand({
-      command,
-      input: wrappedEditor.entireText,
-      fileUri: wrappedEditor.fileUri,
-    });
-    await wrappedEditor.replaceEntireTextWith(commandOutput);
+    return Promise.all(promiseOfCommandOutputs);
   }
 
   private shouldPassEntireText(wrappedEditor: Editor): boolean {
@@ -56,5 +61,9 @@ export abstract class RunCommand implements ExtensionCommand {
       `${EXTENSION_NAME}.processEntireTextIfNoneSelected`,
     );
     return !wrappedEditor.isTextSelected && processEntireText;
+  }
+
+  private getCommandText(): Promise<string | undefined> {
+    return this.commandReader.read();
   }
 }
