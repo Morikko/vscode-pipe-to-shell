@@ -37,7 +37,11 @@ export class AppIntegratorFactory {
     return this.wrapCommand(
       new RunCommand(
         this.shellCommandService,
-        new CommandReader(this.historyStore, vscode.window),
+        new CommandReader(
+          this.historyStore,
+          vscode.window,
+          this.workspaceAdapter,
+        ),
         this.historyStore,
         this.workspaceAdapter,
         true,
@@ -49,7 +53,11 @@ export class AppIntegratorFactory {
     return this.wrapCommand(
       new RunCommand(
         this.shellCommandService,
-        new CommandReader(this.historyStore, vscode.window),
+        new CommandReader(
+          this.historyStore,
+          vscode.window,
+          this.workspaceAdapter,
+        ),
         this.historyStore,
         this.workspaceAdapter,
         false,

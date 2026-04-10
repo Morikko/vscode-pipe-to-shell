@@ -4,8 +4,14 @@ import { any, mockMethods, mockType, verify, when } from "../helper";
 import { CommandReader } from "../../lib/command-reader";
 import * as vscode from "vscode";
 import { HistoryStore } from "../../lib/history-store";
+import { Workspace } from "../../lib/adapters/workspace";
 
 describe("CommandReader", () => {
+  const workspaceAdapter = mockType<Workspace>({
+    getConfig: (key: string) =>
+      key === "editWithShell.processEntireTextIfNoneSelected" && false,
+  });
+
   it("allows user to pick and modify a past command. Commands shown last one first", async () => {
     const historyStore = mockType<HistoryStore>({
       getAll: () => ["COMMAND_1", "COMMAND_2"],
@@ -29,7 +35,11 @@ describe("CommandReader", () => {
       }),
       // @ts-expect-error interface issue
     ).thenResolve("COMMAND_FINAL");
-    const reader = new CommandReader(historyStore, vscodeWindow);
+    const reader = new CommandReader(
+      historyStore,
+      vscodeWindow,
+      workspaceAdapter,
+    );
     const command = await reader.read();
 
     assert.deepStrictEqual(command, "COMMAND_FINAL");
@@ -48,7 +58,11 @@ describe("CommandReader", () => {
       // @ts-expect-error interface issue
     ).thenResolve("COMMAND");
     const historyStore = mockType<HistoryStore>({ getAll: () => [] });
-    const reader = new CommandReader(historyStore, vscodeWindow);
+    const reader = new CommandReader(
+      historyStore,
+      vscodeWindow,
+      workspaceAdapter,
+    );
     const command = await reader.read();
 
     assert.deepStrictEqual(command, "COMMAND");
@@ -70,7 +84,11 @@ describe("CommandReader", () => {
     const historyStore = mockType<HistoryStore>({
       getAll: () => ["COMMAND_1", "COMMAND_2"],
     });
-    const reader = new CommandReader(historyStore, vscodeWindow);
+    const reader = new CommandReader(
+      historyStore,
+      vscodeWindow,
+      workspaceAdapter,
+    );
     const command = await reader.read();
 
     assert.deepStrictEqual(command, "COMMAND");
