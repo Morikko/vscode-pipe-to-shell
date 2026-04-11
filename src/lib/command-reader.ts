@@ -23,14 +23,18 @@ class MessageItem implements vscode.QuickPickItem {
 }
 
 class SaveButton implements vscode.QuickInputButton {
-  tooltip = "Save executed command in history";
+  tooltip = "Save executed command in history (Ctrl+S)";
   iconPath = new vscode.ThemeIcon("save");
   location = vscode.QuickInputButtonLocation.Inline;
   toggle = { checked: true };
+
+  constructor(readonly checked: boolean) {
+    this.toggle.checked = checked;
+  }
 }
 
 class NewEditorButton implements vscode.QuickInputButton {
-  tooltip = "Open result in new editor";
+  tooltip = "Open result in new editor (Ctrl+N)";
   iconPath = new vscode.ThemeIcon("new-file");
   location = vscode.QuickInputButtonLocation.Inline;
   toggle = { checked: false };
@@ -41,17 +45,25 @@ class NewEditorButton implements vscode.QuickInputButton {
 }
 
 class ShowHistoryButton implements vscode.QuickInputButton {
-  tooltip = "Show/Hide history";
+  tooltip = "Show/Hide history (Ctrl+H)";
   iconPath = new vscode.ThemeIcon("clock");
   location = vscode.QuickInputButtonLocation.Title;
   toggle = { checked: true };
+
+  constructor(readonly checked: boolean) {
+    this.toggle.checked = checked;
+  }
 }
 
 class ShowFavoriteButton implements vscode.QuickInputButton {
-  tooltip = "Show/Hide favorite command";
+  tooltip = "Show/Hide favorite command (Ctrl+F)";
   iconPath = new vscode.ThemeIcon("star-full");
   location = vscode.QuickInputButtonLocation.Title;
   toggle = { checked: true };
+
+  constructor(readonly checked: boolean) {
+    this.toggle.checked = checked;
+  }
 }
 
 export class CommandReader {
@@ -61,12 +73,51 @@ export class CommandReader {
   private showFavorite: boolean = true;
   private shouldSaveCommand: boolean = true;
   private shouldOpenNewEditor: boolean = false;
+  private input: vscode.QuickPick<MessageItem> | undefined = undefined;
 
   constructor(
     private readonly historyStore: HistoryStore,
     private readonly vsWindow: typeof vscode.window,
     private readonly workspaceAdapter: Workspace,
   ) {}
+
+  toggleOpenNewEditor() {
+    if (this.input === undefined) {
+      return;
+    }
+
+    this.shouldOpenNewEditor = !this.shouldOpenNewEditor;
+    this.input.buttons = this.makeButtons();
+  }
+
+  toggleSaveHistory() {
+    if (this.input === undefined) {
+      return;
+    }
+
+    this.shouldSaveCommand = !this.shouldSaveCommand;
+    this.input.buttons = this.makeButtons();
+  }
+
+  toggleShowHistory() {
+    if (this.input === undefined) {
+      return;
+    }
+
+    this.showHistory = !this.showHistory;
+    this.input.buttons = this.makeButtons();
+    this.input.items = this.makeSuggestions();
+  }
+
+  toggleShowFavorite() {
+    if (this.input === undefined) {
+      return;
+    }
+
+    this.showFavorite = !this.showFavorite;
+    this.input.buttons = this.makeButtons();
+    this.input.items = this.makeSuggestions();
+  }
 
   init() {
     const configPath = `${EXTENSION_NAME}.favoriteCommands`;
@@ -92,11 +143,24 @@ export class CommandReader {
   async read(shouldOpenNewEditor: boolean): Promise<CommandOptions> {
     this.init();
     this.shouldOpenNewEditor = shouldOpenNewEditor;
-    return {
-      command: await this.pickCommand(),
-      shouldSaveCommand: this.shouldSaveCommand,
-      shouldOpenNewEditor: this.shouldOpenNewEditor,
-    };
+    try {
+      vscode.commands.executeCommand(
+        "setContext",
+        "editWithShell.CommandReaderOpen",
+        true,
+      );
+      return {
+        command: await this.pickCommand(),
+        shouldSaveCommand: this.shouldSaveCommand,
+        shouldOpenNewEditor: this.shouldOpenNewEditor,
+      };
+    } finally {
+      vscode.commands.executeCommand(
+        "setContext",
+        "editWithShell.CommandReaderOpen",
+        false,
+      );
+    }
   }
 
   makeSuggestions() {
@@ -106,22 +170,45 @@ export class CommandReader {
     ];
   }
 
+  makeButtons() {
+    return [
+      new ShowHistoryButton(this.showHistory),
+      new ShowFavoriteButton(this.showFavorite),
+      new NewEditorButton(this.shouldOpenNewEditor),
+      new SaveButton(this.shouldSaveCommand),
+    ];
+  }
+
+  buttonAction(button: vscode.QuickInputButton) {
+    if (this.input === undefined) {
+      return;
+    }
+
+    if (button instanceof ShowFavoriteButton) {
+      this.showFavorite = button.toggle.checked;
+      this.input.items = this.makeSuggestions();
+    } else if (button instanceof ShowHistoryButton) {
+      this.showHistory = button.toggle.checked;
+      this.input.items = this.makeSuggestions();
+    } else if (button instanceof SaveButton) {
+      this.shouldSaveCommand = button.toggle.checked;
+    } else if (button instanceof NewEditorButton) {
+      this.shouldOpenNewEditor = button.toggle.checked;
+    }
+  }
+
   async pickCommand() {
     const disposables: vscode.Disposable[] = [];
     try {
       return await new Promise<string | undefined>((resolve) => {
         const input = this.vsWindow.createQuickPick<MessageItem>();
+        this.input = input;
         input.placeholder = "Write a new command or select from the suggestion";
         input.items = this.makeSuggestions();
         input.ignoreFocusOut = true;
         input.matchOnDetail = true;
         input.canSelectMany = true;
-        input.buttons = [
-          new ShowHistoryButton(),
-          new ShowFavoriteButton(),
-          new NewEditorButton(this.shouldOpenNewEditor),
-          new SaveButton(),
-        ];
+        input.buttons = this.makeButtons();
         disposables.push(
           input.onDidChangeActive((items) => {
             if (items.length > 0) {
@@ -131,6 +218,7 @@ export class CommandReader {
             }
           }),
           input.onDidChangeSelection((items) => {
+            // Set the selected item content in the input box and unselect it
             if (input.selectedItems.length > 0) {
               input.value = items[0].label;
               input.selectedItems = [];
@@ -145,19 +233,7 @@ export class CommandReader {
             resolve(undefined);
             input.dispose();
           }),
-          input.onDidTriggerButton((button) => {
-            if (button instanceof ShowFavoriteButton) {
-              this.showFavorite = button.toggle.checked;
-              input.items = this.makeSuggestions();
-            } else if (button instanceof ShowHistoryButton) {
-              this.showHistory = button.toggle.checked;
-              input.items = this.makeSuggestions();
-            } else if (button instanceof SaveButton) {
-              this.shouldSaveCommand = button.toggle.checked;
-            } else if (button instanceof NewEditorButton) {
-              this.shouldOpenNewEditor = button.toggle.checked;
-            }
-          }),
+          input.onDidTriggerButton(this.buttonAction),
         );
         input.show();
       });

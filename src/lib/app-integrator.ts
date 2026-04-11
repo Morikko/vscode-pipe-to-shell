@@ -2,6 +2,9 @@ import { EXTENSION_NAME } from "./const";
 import { ExecutionContextLike } from "./types/vscode";
 import { CommandWrap } from "./command-wrap";
 
+import * as vscode from "vscode";
+import { CommandReader } from "./command-reader";
+
 export class AppIntegrator {
   constructor(
     private readonly runCommandInPlace: CommandWrap,
@@ -9,6 +12,7 @@ export class AppIntegrator {
     private readonly clearHistoryCommand: CommandWrap,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private readonly vscode: any,
+    private readonly commandReader: CommandReader,
   ) {}
 
   integrate(context: ExecutionContextLike) {
@@ -36,5 +40,38 @@ export class AppIntegrator {
       this.runCommandNewEditor,
     );
     context.subscriptions.push(runCommandNewEditor);
+
+    // QuickOpen Keybinding
+    const CommandReaderToggleNewEditor = vscode.commands.registerCommand(
+      "editWithShell.CommandReaderToggleNewEditor",
+      () => {
+        this.commandReader.toggleOpenNewEditor();
+      },
+    );
+    context.subscriptions.push(CommandReaderToggleNewEditor);
+
+    const CommandReaderToggleSaveHistory = vscode.commands.registerCommand(
+      "editWithShell.CommandReaderToggleSaveHistory",
+      () => {
+        this.commandReader.toggleSaveHistory();
+      },
+    );
+    context.subscriptions.push(CommandReaderToggleSaveHistory);
+
+    const CommandReaderToggleShowFavorite = vscode.commands.registerCommand(
+      "editWithShell.CommandReaderToggleShowFavorite",
+      () => {
+        this.commandReader.toggleShowFavorite();
+      },
+    );
+    context.subscriptions.push(CommandReaderToggleShowFavorite);
+
+    const CommandReaderToggleShowHistory = vscode.commands.registerCommand(
+      "editWithShell.CommandReaderToggleShowHistory",
+      () => {
+        this.commandReader.toggleShowHistory();
+      },
+    );
+    context.subscriptions.push(CommandReaderToggleShowHistory);
   }
 }

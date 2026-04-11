@@ -48,6 +48,28 @@
         "category": "EditWithShell"
       }
     ],
+    "keybindings": [
+      {
+        "command": "editWithShell.CommandReaderToggleNewEditor",
+        "key": "ctrl+n",
+        "when": "editWithShell.CommandReaderOpen"
+      },
+      {
+        "command": "editWithShell.CommandReaderToggleSaveHistory",
+        "key": "ctrl+s",
+        "when": "editWithShell.CommandReaderOpen"
+      },
+      {
+        "command": "editWithShell.CommandReaderToggleShowFavorite",
+        "key": "ctrl+f",
+        "when": "editWithShell.CommandReaderOpen"
+      },
+      {
+        "command": "editWithShell.CommandReaderToggleShowHistory",
+        "key": "ctrl+h",
+        "when": "editWithShell.CommandReaderOpen"
+      }
+    ],
     "configuration": {
       "type": "object",
       "title": "Edit with Shell Command configurations",

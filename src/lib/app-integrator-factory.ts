@@ -19,9 +19,15 @@ export class AppIntegratorFactory {
     workspaceAdapter?: WorkspaceAdapter;
     historyStore?: HistoryStore;
   };
+  private commandReader: CommandReader;
 
   constructor() {
     this.cache = Object.create(null);
+    this.commandReader = new CommandReader(
+      this.historyStore,
+      vscode.window,
+      this.workspaceAdapter,
+    );
   }
 
   create() {
@@ -30,6 +36,7 @@ export class AppIntegratorFactory {
       this.runCommandNewEditor,
       this.clearHistoryCommand,
       vscode,
+      this.commandReader,
     );
   }
 
@@ -37,11 +44,7 @@ export class AppIntegratorFactory {
     return this.wrapCommand(
       new RunCommand(
         this.shellCommandService,
-        new CommandReader(
-          this.historyStore,
-          vscode.window,
-          this.workspaceAdapter,
-        ),
+        this.commandReader,
         this.historyStore,
         this.workspaceAdapter,
         true,
@@ -53,11 +56,7 @@ export class AppIntegratorFactory {
     return this.wrapCommand(
       new RunCommand(
         this.shellCommandService,
-        new CommandReader(
-          this.historyStore,
-          vscode.window,
-          this.workspaceAdapter,
-        ),
+        this.commandReader,
         this.historyStore,
         this.workspaceAdapter,
         false,
