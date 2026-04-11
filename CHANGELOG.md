@@ -8,8 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - Open the command output in a new editor
+- Add buttons to toggle history/favorite suggestions
 
 ### Changed
+- Merge enter command and history mode
 - The `cwd` of the execute shell command in `WORKSPACE_ROOT` mode is now first
   the workspace root where the file belongs. If none, the root of the first
   folder in the workspace. And finally, the home directory.
