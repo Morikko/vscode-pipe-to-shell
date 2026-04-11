@@ -40,7 +40,7 @@ describe("CommandReader", () => {
       vscodeWindow,
       workspaceAdapter,
     );
-    const command = await reader.read();
+    const command = await reader.read(false);
 
     assert.deepStrictEqual(command, "COMMAND_FINAL");
   });
@@ -63,7 +63,7 @@ describe("CommandReader", () => {
       vscodeWindow,
       workspaceAdapter,
     );
-    const command = await reader.read();
+    const command = await reader.read(false);
 
     assert.deepStrictEqual(command, "COMMAND");
     verify(vscodeWindow.showQuickPick(any()), {
@@ -89,7 +89,7 @@ describe("CommandReader", () => {
       vscodeWindow,
       workspaceAdapter,
     );
-    const command = await reader.read();
+    const command = await reader.read(false);
 
     assert.deepStrictEqual(command, "COMMAND");
   });

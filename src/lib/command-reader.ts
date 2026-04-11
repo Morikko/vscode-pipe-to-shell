@@ -8,6 +8,12 @@ interface FavoriteCommand {
   command: string;
 }
 
+export interface CommandOptions {
+  command: string | undefined;
+  shouldOpenNewEditor: boolean;
+  shouldSaveCommand: boolean;
+}
+
 class MessageItem implements vscode.QuickPickItem {
   constructor(
     public label: string,
@@ -16,8 +22,26 @@ class MessageItem implements vscode.QuickPickItem {
   ) {}
 }
 
+class SaveButton implements vscode.QuickInputButton {
+  tooltip = "Save executed command in history";
+  iconPath = new vscode.ThemeIcon("save");
+  location = vscode.QuickInputButtonLocation.Inline;
+  toggle = { checked: true };
+}
+
+class NewEditorButton implements vscode.QuickInputButton {
+  tooltip = "Open result in new editor";
+  iconPath = new vscode.ThemeIcon("new-file");
+  location = vscode.QuickInputButtonLocation.Inline;
+  toggle = { checked: false };
+
+  constructor(readonly checked: boolean) {
+    this.toggle.checked = checked;
+  }
+}
+
 class ShowHistoryButton implements vscode.QuickInputButton {
-  tooltip = "Show/Hide History";
+  tooltip = "Show/Hide history";
   iconPath = new vscode.ThemeIcon("clock");
   location = vscode.QuickInputButtonLocation.Title;
   toggle = { checked: true };
@@ -35,6 +59,8 @@ export class CommandReader {
   private favoriteSuggestions: MessageItem[] = [];
   private showHistory: boolean = true;
   private showFavorite: boolean = true;
+  private shouldSaveCommand: boolean = true;
+  private shouldOpenNewEditor: boolean = false;
 
   constructor(
     private readonly historyStore: HistoryStore,
@@ -60,11 +86,17 @@ export class CommandReader {
       );
     this.showHistory = true;
     this.showFavorite = true;
+    this.shouldSaveCommand = true;
   }
 
-  async read() {
+  async read(shouldOpenNewEditor: boolean): Promise<CommandOptions> {
     this.init();
-    return this.pickCommand();
+    this.shouldOpenNewEditor = shouldOpenNewEditor;
+    return {
+      command: await this.pickCommand(),
+      shouldSaveCommand: this.shouldSaveCommand,
+      shouldOpenNewEditor: this.shouldOpenNewEditor,
+    };
   }
 
   makeSuggestions() {
@@ -84,7 +116,12 @@ export class CommandReader {
         input.ignoreFocusOut = true;
         input.matchOnDetail = true;
         input.canSelectMany = true;
-        input.buttons = [new ShowHistoryButton(), new ShowFavoriteButton()];
+        input.buttons = [
+          new ShowHistoryButton(),
+          new ShowFavoriteButton(),
+          new NewEditorButton(this.shouldOpenNewEditor),
+          new SaveButton(),
+        ];
         disposables.push(
           input.onDidChangeActive((items) => {
             if (items.length > 0) {
@@ -115,6 +152,10 @@ export class CommandReader {
             } else if (button instanceof ShowHistoryButton) {
               this.showHistory = button.toggle.checked;
               input.items = this.makeSuggestions();
+            } else if (button instanceof SaveButton) {
+              this.shouldSaveCommand = button.toggle.checked;
+            } else if (button instanceof NewEditorButton) {
+              this.shouldOpenNewEditor = button.toggle.checked;
             }
           }),
         );

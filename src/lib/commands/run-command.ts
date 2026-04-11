@@ -4,7 +4,7 @@ import { HistoryStore } from "../history-store";
 import { Workspace } from "../adapters/workspace";
 import { Editor } from "../adapters/editor";
 import { ExtensionCommand } from "./extension-command";
-import { CommandReader } from "../command-reader";
+import { CommandReader, CommandOptions } from "../command-reader";
 import * as vscode from "vscode";
 
 export class RunCommand implements ExtensionCommand {
@@ -17,10 +17,13 @@ export class RunCommand implements ExtensionCommand {
   ) {}
 
   async execute(wrappedEditor: Editor) {
-    const command = await this.getCommandText();
+    const { command, shouldOpenNewEditor, shouldSaveCommand } =
+      await this.getCommandText();
     if (!command) return;
 
-    this.historyStore.add(command);
+    if (shouldSaveCommand) {
+      this.historyStore.add(command);
+    }
 
     let inputTexts: string[];
     let selections: readonly vscode.Selection[];
@@ -38,7 +41,7 @@ export class RunCommand implements ExtensionCommand {
       wrappedEditor.fileUri,
     );
 
-    if (this.inplace) {
+    if (!shouldOpenNewEditor) {
       await wrappedEditor.replaceSelectedTextsWith(selections, commandOutputs);
     } else {
       await wrappedEditor.openNewEditor(commandOutputs.join("\n\n"));
@@ -63,7 +66,7 @@ export class RunCommand implements ExtensionCommand {
     return !wrappedEditor.isTextSelected && processEntireText;
   }
 
-  private getCommandText(): Promise<string | undefined> {
-    return this.commandReader.read();
+  private getCommandText(): Promise<CommandOptions> {
+    return this.commandReader.read(!this.inplace);
   }
 }
