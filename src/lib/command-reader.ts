@@ -13,7 +13,7 @@ export interface CommandOptions {
   shouldSaveCommand: boolean;
 }
 
-class MessageItem implements vscode.QuickPickItem {
+export class SuggestionItem implements vscode.QuickPickItem {
   constructor(
     public label: string,
     public detail: string | undefined = undefined,
@@ -66,13 +66,13 @@ class ShowFavoriteButton implements vscode.QuickInputButton {
 }
 
 export class CommandReader {
-  private historySuggestions: MessageItem[] = [];
-  private favoriteSuggestions: MessageItem[] = [];
+  private historySuggestions: SuggestionItem[] = [];
+  private favoriteSuggestions: SuggestionItem[] = [];
   private showHistory: boolean = true;
   private showFavorite: boolean = true;
   private shouldSaveCommand: boolean = true;
   private shouldOpenNewEditor: boolean = false;
-  private input: vscode.QuickPick<MessageItem> | undefined = undefined;
+  private input: vscode.QuickPick<SuggestionItem> | undefined = undefined;
 
   constructor(
     private readonly historyStore: HistoryStore,
@@ -120,12 +120,16 @@ export class CommandReader {
     this.input.items = this.makeSuggestions();
   }
 
-  makeHistoryMessageItem(command: string): MessageItem {
-    return new MessageItem(command, undefined, new vscode.ThemeIcon("clock"));
+  makeHistorySuggestionItem(command: string): SuggestionItem {
+    return new SuggestionItem(
+      command,
+      undefined,
+      new vscode.ThemeIcon("clock"),
+    );
   }
 
-  makeFavoriteMessageItem(fc: FavoriteCommand): MessageItem {
-    return new MessageItem(
+  makeFavoriteSuggestionItem(fc: FavoriteCommand): SuggestionItem {
+    return new SuggestionItem(
       fc.command,
       fc.id,
       new vscode.ThemeIcon("extensions-star-full"),
@@ -135,10 +139,10 @@ export class CommandReader {
   async init() {
     this.historySuggestions = (await this.historyStore.getAll())
       .reverse()
-      .map(this.makeHistoryMessageItem);
+      .map(this.makeHistorySuggestionItem);
     this.favoriteSuggestions = this.workspaceAdapter
       .getConfig<FavoriteCommand[]>("favoriteCommands")
-      .map(this.makeFavoriteMessageItem);
+      .map(this.makeFavoriteSuggestionItem);
     this.showHistory = true;
     this.showFavorite = true;
     this.shouldSaveCommand = true;
@@ -206,7 +210,7 @@ export class CommandReader {
 
     try {
       return await new Promise<string | undefined>((resolve) => {
-        const input = this.vsWindow.createQuickPick<MessageItem>();
+        const input = this.vsWindow.createQuickPick<SuggestionItem>();
         this.input = input;
         input.placeholder = "Write a new command or select from the suggestion";
         input.items = this.makeSuggestions();
@@ -217,7 +221,8 @@ export class CommandReader {
         disposables.push(
           input.onDidChangeActive((items) => {
             if (items.length > 0) {
-              input.prompt = "Press space to set the command in the input box";
+              input.prompt =
+                "Press space to set the command in the input box, enter to execute it immediately";
             } else {
               input.prompt = "";
             }
@@ -231,7 +236,13 @@ export class CommandReader {
             }
           }),
           input.onDidAccept(() => {
-            resolve(input.value);
+            if (input.activeItems.length) {
+              // If hovering a suggestion, execute it
+              resolve(input.activeItems[0].label);
+            } else {
+              // Else fallback to the user input
+              resolve(input.value);
+            }
             input.hide();
           }),
           input.onDidHide(() => {
