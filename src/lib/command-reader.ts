@@ -119,12 +119,12 @@ export class CommandReader {
     this.input.items = this.makeSuggestions();
   }
 
-  init() {
+  async init() {
     const configPath = `${EXTENSION_NAME}.favoriteCommands`;
 
-    this.historySuggestions = this.historyStore
-      .getAll()
-      .map((x) => new MessageItem(x, undefined, new vscode.ThemeIcon("clock")));
+    this.historySuggestions = (await this.historyStore.getAll()).map(
+      (x) => new MessageItem(x, undefined, new vscode.ThemeIcon("clock")),
+    );
     this.favoriteSuggestions = this.workspaceAdapter
       .getConfig<FavoriteCommand[]>(configPath)
       .map(
@@ -141,7 +141,7 @@ export class CommandReader {
   }
 
   async read(shouldOpenNewEditor: boolean): Promise<CommandOptions> {
-    this.init();
+    await this.init();
     this.shouldOpenNewEditor = shouldOpenNewEditor;
     try {
       vscode.commands.executeCommand(

@@ -1,9 +1,13 @@
 import { EXTENSION_NAME } from "./const";
 import { Workspace } from "./adapters/workspace";
-import { EnvVarWrap } from "./types/node";
 import { dirname } from "path";
 import * as os from "os";
 import * as vscode from "vscode";
+import { ObjectMap } from "./types";
+
+export interface EnvVarWrap {
+  env: ObjectMap<string | undefined>;
+}
 
 enum CurrentDirectoryKind {
   CURRENT_FILE = "currentFile",

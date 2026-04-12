@@ -1,9 +1,9 @@
-import { AppIntegratorFactory } from "./lib/app-integrator-factory";
-import { ExecutionContextLike } from "./lib/types/vscode";
+import { AppIntegrator } from "./lib/app-integrator";
+import * as vscode from "vscode";
 
-exports.activate = (context: ExecutionContextLike) => {
-  const appIntegrator = new AppIntegratorFactory().create();
-  appIntegrator.integrate(context);
+exports.activate = (context: vscode.ExtensionContext) => {
+  const appIntegrator = new AppIntegrator(context);
+  appIntegrator.integrate();
 };
 
 exports.deactivate = () => {};

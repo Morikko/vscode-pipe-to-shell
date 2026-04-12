@@ -3,7 +3,7 @@ import { mockType } from "../../helper";
 
 import { Workspace as WorkspaceAdapter } from "../../../lib/adapters/workspace";
 import * as vscode from "vscode";
-import { ObjectMap } from "../../../lib/types/collection";
+import { ObjectMap } from "../../../lib/types";
 
 describe("WorkspaceAdapter", () => {
   describe("config value", () => {

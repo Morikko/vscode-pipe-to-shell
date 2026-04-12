@@ -8,12 +8,25 @@ import {
   when,
 } from "../helper";
 import { Editor, WrapEditor } from "../../lib/adapters/editor";
-import { Logger } from "../../lib/logger";
-import { ShowErrorMessage } from "../../lib/types/vscode";
 import * as vscode from "vscode";
-import { CommandWrap } from "../../lib/command-wrap";
+import {
+  CommandWrap,
+  ShowErrorMessage,
+  Logger,
+  ErrorMessageFormatter,
+} from "../../lib/command-wrap";
 import { ExtensionCommand } from "../../lib/commands/extension-command";
 import { CommandExecutionError } from "../../lib/errors/command";
+import * as assert from "assert";
+
+describe("ErrorMessageFormatter", () => {
+  const formatter = new ErrorMessageFormatter();
+
+  it("trim text", () => {
+    const formattedText = formatter.format("  normal text  ");
+    assert.deepStrictEqual(formattedText, "normal text");
+  });
+});
 
 describe("CommandWrap", () => {
   let logger: Logger;

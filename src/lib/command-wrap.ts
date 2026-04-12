@@ -1,10 +1,22 @@
-import { ShowErrorMessage } from "./types/vscode";
-import { Logger } from "./logger";
 import { WrapEditor } from "./adapters/editor";
 import { TextEditor as VsTextEditor } from "vscode";
 import { CommandExecutionError } from "./errors/command";
-import { ErrorMessageFormatter } from "./error-message-formatter";
 import { ExtensionCommand } from "./commands/extension-command";
+
+export type ShowErrorMessage = (
+  message: string,
+) => Thenable<string | undefined>;
+
+export interface Logger {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  error(...args: any[]): void;
+}
+
+export class ErrorMessageFormatter {
+  format(message: string) {
+    return (message || "").trim();
+  }
+}
 
 export class CommandWrap {
   private readonly errorMessageFormatter: ErrorMessageFormatter;

@@ -22,7 +22,7 @@ export class RunCommand implements ExtensionCommand {
     if (!command) return;
 
     if (shouldSaveCommand) {
-      this.historyStore.add(command);
+      await this.historyStore.add(command);
     }
 
     let inputTexts: string[];

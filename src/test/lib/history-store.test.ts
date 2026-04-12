@@ -1,39 +1,59 @@
 import * as assert from "assert";
 import { HistoryStore } from "../../lib/history-store";
+import { mockType } from "../helper";
+import * as vscode from "vscode";
 
 describe("HistoryStore", () => {
-  it("retrieves all recorded commands", () => {
-    const historyStore = new HistoryStore();
-    historyStore.add("COMMAND_1");
-    historyStore.add("COMMAND_2");
-    assert.deepStrictEqual(historyStore.getAll(), ["COMMAND_1", "COMMAND_2"]);
+  let historyState: string[] = [];
+  const fakeContext = mockType<vscode.ExtensionContext>({
+    globalState: {
+      get: (key: string) => historyState,
+      update: (key: string, history: string[]) => (historyState = history),
+    },
   });
 
-  it("does not record the same command twice", () => {
-    const historyStore = new HistoryStore();
-    historyStore.add("COMMAND_1");
-    historyStore.add("COMMAND_1");
-    assert.deepStrictEqual(historyStore.getAll(), ["COMMAND_1"]);
+  beforeEach(() => {
+    historyState = [];
   });
 
-  it("returns the last used command at the end", () => {
-    const historyStore = new HistoryStore();
-    historyStore.add("COMMAND_1");
-    historyStore.add("COMMAND_2");
-    historyStore.add("COMMAND_1");
-    assert.deepStrictEqual(historyStore.getAll(), ["COMMAND_2", "COMMAND_1"]);
+  it("retrieves all recorded commands", async () => {
+    const historyStore = new HistoryStore(fakeContext);
+    await historyStore.add("COMMAND_1");
+    await historyStore.add("COMMAND_2");
+    assert.deepStrictEqual(await historyStore.getAll(), [
+      "COMMAND_1",
+      "COMMAND_2",
+    ]);
   });
 
-  it("returns an empty list if no commands are recorded yet", () => {
-    const historyStore = new HistoryStore();
-    assert.deepStrictEqual(historyStore.getAll(), []);
+  it("does not record the same command twice", async () => {
+    const historyStore = new HistoryStore(fakeContext);
+    await historyStore.add("COMMAND_1");
+    await historyStore.add("COMMAND_1");
+    assert.deepStrictEqual(await historyStore.getAll(), ["COMMAND_1"]);
   });
 
-  it("clears all history", () => {
-    const historyStore = new HistoryStore();
-    historyStore.add("COMMAND_1");
-    historyStore.add("COMMAND_2");
-    historyStore.clear();
-    assert.deepStrictEqual(historyStore.getAll(), []);
+  it("returns the last used command at the end", async () => {
+    const historyStore = new HistoryStore(fakeContext);
+    await historyStore.add("COMMAND_1");
+    await historyStore.add("COMMAND_2");
+    await historyStore.add("COMMAND_1");
+    assert.deepStrictEqual(await historyStore.getAll(), [
+      "COMMAND_2",
+      "COMMAND_1",
+    ]);
+  });
+
+  it("returns an empty list if no commands are recorded yet", async () => {
+    const historyStore = new HistoryStore(fakeContext);
+    assert.deepStrictEqual(await historyStore.getAll(), []);
+  });
+
+  it("clears all history", async () => {
+    const historyStore = new HistoryStore(fakeContext);
+    await historyStore.add("COMMAND_1");
+    await historyStore.add("COMMAND_2");
+    await historyStore.clear();
+    assert.deepStrictEqual(await historyStore.getAll(), []);
   });
 });

@@ -5,6 +5,6 @@ export class ClearHistoryCommand implements ExtensionCommand {
   constructor(private readonly historyStore: HistoryStore) {}
 
   async execute() {
-    this.historyStore.clear();
+    return this.historyStore.clear();
   }
 }

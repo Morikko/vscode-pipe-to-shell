@@ -1,29 +1,39 @@
-export class HistoryStore {
-  private history: string[];
+import * as vscode from "vscode";
 
-  constructor() {
-    this.history = [];
-  }
+export class HistoryStore {
+  constructor(private context: vscode.ExtensionContext) {}
 
   getAll() {
-    return this.history;
+    return this.loadHistory();
   }
 
-  clear() {
-    this.history = [];
+  async clear() {
+    await this.saveHistory([]);
   }
 
-  add(command: string) {
-    const history = this.history;
-    const index = history.indexOf(command);
+  async add(command: string) {
+    const currentHistory = await this.getAll();
+    const index = currentHistory.indexOf(command);
+
+    let newHistory: string[];
     if (index === -1) {
-      this.history = [...history, command];
-      return;
+      newHistory = [...currentHistory, command];
+    } else {
+      newHistory = [
+        ...currentHistory.slice(0, index),
+        ...currentHistory.slice(index + 1),
+        command,
+      ];
     }
-    this.history = [
-      ...history.slice(0, index),
-      ...history.slice(index + 1),
-      command,
-    ];
+
+    await this.saveHistory(newHistory);
+  }
+
+  private async loadHistory(): Promise<string[]> {
+    return this.context.globalState.get<string[]>("history") || [];
+  }
+
+  private async saveHistory(history: string[]) {
+    return this.context.globalState.update("history", history);
   }
 }

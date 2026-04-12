@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add buttons to toggle history/favorite suggestions
 - Add button to control if command is saved in history
 - Add button to toggle if result is open in a new editor
+- Persistent History
 
 ### Changed
 - Merge enter command and history mode
