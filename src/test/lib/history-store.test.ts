@@ -7,8 +7,8 @@ describe("HistoryStore", () => {
   let historyState: string[] = [];
   const fakeContext = mockType<vscode.ExtensionContext>({
     globalState: {
-      get: (key: string) => historyState,
-      update: (key: string, history: string[]) => (historyState = history),
+      get: (_key: string) => historyState,
+      update: (_key: string, history: string[]) => (historyState = history),
     },
   });
 
