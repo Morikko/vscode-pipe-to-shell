@@ -89,6 +89,31 @@ describe("CommandReader", () => {
       ]);
     });
 
+    it("returns merged suggestions", async () => {
+      const testee = new CommandReader(
+        makeHistoryStore(["COMMAND_1", "COMMAND_2"]),
+        makeVsWindow(),
+        makeWorkspaceAdapter([
+          { command: "FAVORITE_1", id: "my_fav_1" },
+          { command: "COMMAND_2", id: "my_fav_2" },
+        ]),
+      );
+      await testee.init();
+      assert.deepStrictEqual(testee.makeSuggestions(), [
+        // instead of history
+        testee.makeFavoriteSuggestionItem({
+          command: "COMMAND_2",
+          id: "my_fav_2",
+        }),
+        testee.makeHistorySuggestionItem("COMMAND_1"),
+
+        testee.makeFavoriteSuggestionItem({
+          command: "FAVORITE_1",
+          id: "my_fav_1",
+        }),
+      ]);
+    });
+
     it("returns suggestions if asked", async () => {
       const testee = new CommandReader(
         makeHistoryStore(["COMMAND_1", "COMMAND_2"]),

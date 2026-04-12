@@ -1,6 +1,7 @@
 import { HistoryStore } from "./history-store";
 import * as vscode from "vscode";
 import { Workspace } from "./adapters/workspace";
+import { ObjectMap } from "./types";
 
 export interface FavoriteCommand {
   id: string;
@@ -172,10 +173,30 @@ export class CommandReader {
   }
 
   makeSuggestions() {
-    return [
-      ...(this.showHistory ? this.historySuggestions : []),
-      ...(this.showFavorite ? this.favoriteSuggestions : []),
-    ];
+    // merge
+    if (this.showHistory && this.showFavorite) {
+      let historySuggestions: SuggestionItem[] = [];
+      const favSugByCmd: { [key: string]: SuggestionItem } = {};
+      for (let fc of this.favoriteSuggestions) {
+        favSugByCmd[fc.label] = fc;
+      }
+
+      for (let h of this.historySuggestions) {
+        if (h.label in favSugByCmd) {
+          historySuggestions.push(favSugByCmd[h.label]);
+          delete favSugByCmd[h.label];
+        } else {
+          historySuggestions.push(h);
+        }
+      }
+
+      return [...historySuggestions, ...Object.values(favSugByCmd)];
+    } else {
+      return [
+        ...(this.showHistory ? this.historySuggestions : []),
+        ...(this.showFavorite ? this.favoriteSuggestions : []),
+      ];
+    }
   }
 
   makeButtons() {
