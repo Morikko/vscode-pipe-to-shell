@@ -1,9 +1,9 @@
 import { HistoryStore } from "./history-store";
 import * as vscode from "vscode";
-import { EXTENSION_NAME } from "./const";
 import { Workspace } from "./adapters/workspace";
+import { rejects } from "assert";
 
-interface FavoriteCommand {
+export interface FavoriteCommand {
   id: string;
   command: string;
 }
@@ -100,41 +100,46 @@ export class CommandReader {
   }
 
   toggleShowHistory() {
+    this.showHistory = !this.showHistory;
+
     if (this.input === undefined) {
       return;
     }
 
-    this.showHistory = !this.showHistory;
     this.input.buttons = this.makeButtons();
     this.input.items = this.makeSuggestions();
   }
 
   toggleShowFavorite() {
+    this.showFavorite = !this.showFavorite;
+
     if (this.input === undefined) {
       return;
     }
 
-    this.showFavorite = !this.showFavorite;
     this.input.buttons = this.makeButtons();
     this.input.items = this.makeSuggestions();
   }
 
-  async init() {
-    const configPath = `${EXTENSION_NAME}.favoriteCommands`;
+  makeHistoryMessageItem(command: string): MessageItem {
+    return new MessageItem(command, undefined, new vscode.ThemeIcon("clock"));
+  }
 
+  makeFavoriteMessageItem(fc: FavoriteCommand): MessageItem {
+    return new MessageItem(
+      fc.command,
+      fc.id,
+      new vscode.ThemeIcon("extensions-star-full"),
+    );
+  }
+
+  async init() {
     this.historySuggestions = (await this.historyStore.getAll()).map(
-      (x) => new MessageItem(x, undefined, new vscode.ThemeIcon("clock")),
+      this.makeHistoryMessageItem,
     );
     this.favoriteSuggestions = this.workspaceAdapter
-      .getConfig<FavoriteCommand[]>(configPath)
-      .map(
-        (fc) =>
-          new MessageItem(
-            fc.command,
-            fc.id,
-            new vscode.ThemeIcon("extensions-star-full"),
-          ),
-      );
+      .getConfig<FavoriteCommand[]>("favoriteCommands")
+      .map(this.makeFavoriteMessageItem);
     this.showHistory = true;
     this.showFavorite = true;
     this.shouldSaveCommand = true;
@@ -198,9 +203,10 @@ export class CommandReader {
   }
 
   async pickCommand() {
-    const disposables: vscode.Disposable[] = [];
-    try {
-      return await new Promise<string | undefined>((resolve) => {
+    return new Promise<string | undefined>((resolve, reject) => {
+      const disposables: vscode.Disposable[] = [];
+
+      try {
         const input = this.vsWindow.createQuickPick<MessageItem>();
         this.input = input;
         input.placeholder = "Write a new command or select from the suggestion";
@@ -236,9 +242,11 @@ export class CommandReader {
           input.onDidTriggerButton(this.buttonAction),
         );
         input.show();
-      });
-    } finally {
-      disposables.forEach((d) => d.dispose());
-    }
+      } catch (e) {
+        reject(e);
+      } finally {
+        disposables.forEach((d) => d.dispose());
+      }
+    });
   }
 }

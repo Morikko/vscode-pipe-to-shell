@@ -20,11 +20,16 @@ describe("RunCommand", () => {
 
   describe('When command is specified and "processEntireTextIfNoneSelected" is set to "false"', () => {
     const commandReader = mockType<CommandReader>({
-      read: () => Promise.resolve("COMMAND_STRING"),
+      read: () =>
+        Promise.resolve({
+          command: "COMMAND_STRING",
+          shouldOpenNewEditor: false,
+          shouldSaveCommand: true,
+        }),
     });
     const workspaceAdapter = mockType<Workspace>({
       getConfig: (key: string) =>
-        key === "editWithShell.processEntireTextIfNoneSelected" && false,
+        key === "processEntireTextIfNoneSelected" && false,
     });
 
     let shellCommandService: ShellCommandService;
@@ -100,11 +105,15 @@ describe("RunCommand", () => {
 
   describe('When command is specified and "processEntireTextIfNoneSelected" is set to "true"', () => {
     const commandReader = mockType<CommandReader>({
-      read: () => Promise.resolve("COMMAND_STRING"),
+      read: () =>
+        Promise.resolve({
+          command: "COMMAND_STRING",
+          shouldOpenNewEditor: true,
+          shouldSaveCommand: true,
+        }),
     });
     const workspaceAdapter = mockType<Workspace>({
-      getConfig: (key: string) =>
-        key === "editWithShell.processEntireTextIfNoneSelected",
+      getConfig: (key: string) => key === "processEntireTextIfNoneSelected",
     });
 
     let shellCommandService: ShellCommandService;
@@ -139,7 +148,7 @@ describe("RunCommand", () => {
     });
 
     it("runs command with selected text", async () => {
-      const editor = mockMethods<Editor>(["replaceSelectedTextsWith"], {
+      const editor = mockMethods<Editor>(["openNewEditor"], {
         isTextSelected: true,
         selectedTexts: ["SELECTED_TEXT"],
         selections: [partialSelection],
@@ -150,16 +159,11 @@ describe("RunCommand", () => {
 
       await command.execute(editor);
 
-      verify(
-        editor.replaceSelectedTextsWith(
-          [partialSelection],
-          ["COMMAND_OUTPUT_1"],
-        ),
-      );
+      verify(editor.openNewEditor("COMMAND_OUTPUT_1"));
     });
 
     it("runs command with entire text", async () => {
-      const editor = mockMethods<Editor>(["replaceSelectedTextsWith"], {
+      const editor = mockMethods<Editor>(["openNewEditor"], {
         isTextSelected: false,
         selectedTexts: [""],
         selections: [partialSelection],
@@ -170,9 +174,7 @@ describe("RunCommand", () => {
 
       await command.execute(editor);
 
-      verify(
-        editor.replaceSelectedTextsWith([fullSelection], ["COMMAND_OUTPUT_2"]),
-      );
+      verify(editor.openNewEditor("COMMAND_OUTPUT_2"));
     });
   });
 
@@ -183,7 +185,14 @@ describe("RunCommand", () => {
       const editor = mock(Editor);
       const command = new RunCommand(
         shellCommandService,
-        mockType<CommandReader>({ read: () => Promise.resolve() }),
+        mockType<CommandReader>({
+          read: () =>
+            Promise.resolve({
+              command: undefined,
+              shouldOpenNewEditor: false,
+              shouldSaveCommand: true,
+            }),
+        }),
         historyStore,
         mockType<Workspace>(),
         true,

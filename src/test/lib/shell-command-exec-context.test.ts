@@ -81,7 +81,7 @@ describe("ShellCommandExecContext", () => {
       "getRootPathFor",
       "getDefaultRootPath",
     ]);
-    when(workspace.getConfig("editWithShell.currentDirectoryKind")).thenReturn(
+    when(workspace.getConfig("currentDirectoryKind")).thenReturn(
       currentDirectoryKind,
     );
     when(workspace.getRootPathFor(fileUri)).thenReturn(WORKSPACE_ROOT);

@@ -7,7 +7,6 @@ import {
 import { ProcessRunner } from "../../lib/process-runner";
 import { ChildProcess } from "child_process";
 import { Workspace } from "../../lib/adapters/workspace";
-import { EXTENSION_NAME } from "../../lib/const";
 import Process = NodeJS.Process;
 import * as vscode from "vscode";
 
@@ -58,15 +57,9 @@ describe("ShellCommandService", () => {
     );
 
     const workspace = mock(Workspace);
-    when(workspace.getConfig(`${EXTENSION_NAME}.shell.${platform}`)).thenReturn(
-      "SHELL_PATH",
-    );
-    when(
-      workspace.getConfig(`${EXTENSION_NAME}.shellArgs.${platform}`),
-    ).thenReturn(["SHELL_ARG"]);
-    when(
-      workspace.getConfig(`${EXTENSION_NAME}.currentDirectoryKind`),
-    ).thenReturn("currentFile");
+    when(workspace.getConfig(platform, "shell")).thenReturn("SHELL_PATH");
+    when(workspace.getConfig(platform, "shellArgs")).thenReturn(["SHELL_ARG"]);
+    when(workspace.getConfig("currentDirectoryKind")).thenReturn("currentFile");
 
     service = new ShellCommandService(
       processRunner,

@@ -1,4 +1,3 @@
-import { EXTENSION_NAME } from "./const";
 import { Workspace } from "./adapters/workspace";
 import { ObjectMap } from "./types";
 
@@ -20,15 +19,11 @@ export class ShellSettingsResolver {
   ) {}
 
   shellProgramme(): string {
-    return this.workspaceAdapter.getConfig<string>(
-      `${EXTENSION_NAME}.shell.${this.osKind}`,
-    );
+    return this.workspaceAdapter.getConfig<string>(this.osKind, "shell");
   }
 
   shellArgs(): string[] {
-    return this.workspaceAdapter.getConfig<string[]>(
-      `${EXTENSION_NAME}.shellArgs.${this.osKind}`,
-    );
+    return this.workspaceAdapter.getConfig<string[]>(this.osKind, "shellArgs");
   }
 
   private get osKind() {

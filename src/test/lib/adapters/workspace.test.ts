@@ -3,18 +3,18 @@ import { mockType } from "../../helper";
 
 import { Workspace as WorkspaceAdapter } from "../../../lib/adapters/workspace";
 import * as vscode from "vscode";
-import { ObjectMap } from "../../../lib/types";
+import { EXTENSION_NAME } from "../../../lib/const";
 
 describe("WorkspaceAdapter", () => {
   describe("config value", () => {
     const workspaceAdapter = new WorkspaceAdapter(fakeVscodeWorkspace());
 
     it("gets config value of specified 2 level path", () => {
-      assert.deepStrictEqual(workspaceAdapter.getConfig("A.B"), "VALUE1");
+      assert.deepStrictEqual(workspaceAdapter.getConfig("B"), "VALUE1");
     });
 
     it("gets config value of specified 4 level path", () => {
-      assert.deepStrictEqual(workspaceAdapter.getConfig("C.D.E.F"), "VALUE2");
+      assert.deepStrictEqual(workspaceAdapter.getConfig("F", "D.E"), "VALUE2");
     });
   });
 
@@ -72,19 +72,14 @@ describe("WorkspaceAdapter", () => {
   function fakeVscodeWorkspace(
     workspaceFolders?: { uri: { fsPath: string } }[],
   ) {
-    const config = {
-      "A.B": "VALUE1",
-      "C.D.E.F": "VALUE2",
-    } as ObjectMap<string | undefined>;
-
     return mockType<typeof vscode.workspace>({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       getConfiguration: (oneAbove: any) => {
         switch (oneAbove) {
-          case "A":
-            return { get: (name: string) => config[`A.${name}`] };
-          case "C.D.E":
-            return { get: (name: string) => config[`C.D.E.${name}`] };
+          case EXTENSION_NAME:
+            return { get: (name: string) => name == "B" && "VALUE1" };
+          case `${EXTENSION_NAME}.D.E`:
+            return { get: (name: string) => name == "F" && "VALUE2" };
           default:
             return { get: () => {} };
         }

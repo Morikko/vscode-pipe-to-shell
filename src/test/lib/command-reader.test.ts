@@ -1,96 +1,134 @@
 import * as assert from "assert";
-import { any, mockMethods, mockType, verify, when } from "../helper";
+import { mockMethods, mockType, when } from "../helper";
 
-import { CommandReader } from "../../lib/command-reader";
+import { CommandReader, FavoriteCommand } from "../../lib/command-reader";
 import * as vscode from "vscode";
 import { HistoryStore } from "../../lib/history-store";
 import { Workspace } from "../../lib/adapters/workspace";
 
 describe("CommandReader", () => {
-  const workspaceAdapter = mockType<Workspace>({
-    getConfig: (key: string) =>
-      key === "editWithShell.processEntireTextIfNoneSelected" && false,
-  });
-
   it("allows user to pick and modify a past command. Commands shown last one first", async () => {
-    const historyStore = mockType<HistoryStore>({
-      getAll: () => ["COMMAND_1", "COMMAND_2"],
+    const vsWindow = makeVsWindow();
+
+    when(vsWindow.createQuickPick()).thenReturn({
+      value: "COMMAND",
+      onDidChangeActive: (_v) => new vscode.Disposable(() => {}),
+      onDidChangeSelection: (_v) => new vscode.Disposable(() => {}),
+      onDidAccept: (v) => {
+        v(); // accept
+        return new vscode.Disposable(() => {});
+      },
+      onDidHide: (_v) => new vscode.Disposable(() => {}),
+      onDidTriggerButton: (_v) => new vscode.Disposable(() => {}),
+      hide: () => {},
+      show: () => {},
     });
-    const vscodeWindow = mockMethods<typeof vscode.window>([
-      "showInputBox",
-      "showQuickPick",
-    ]);
-    when(
-      vscodeWindow.showQuickPick(["COMMAND_2", "COMMAND_1"], {
-        placeHolder:
-          "Select a command to reuse or Cancel (Esc) to write a new command",
-      }),
-      // @ts-expect-error interface issue
-    ).thenResolve("COMMAND_1");
-    when(
-      vscodeWindow.showInputBox({
-        placeHolder: "Enter a command",
-        prompt: "Edit the command if necessary",
-        value: "COMMAND_1",
-      }),
-      // @ts-expect-error interface issue
-    ).thenResolve("COMMAND_FINAL");
+
     const reader = new CommandReader(
-      historyStore,
-      vscodeWindow,
-      workspaceAdapter,
+      makeHistoryStore(["COMMAND_1", "COMMAND_2"]),
+      vsWindow,
+      makeWorkspaceAdapter([]),
     );
-    const command = await reader.read(false);
 
-    assert.deepStrictEqual(command, "COMMAND_FINAL");
-  });
+    assert.deepStrictEqual(await reader.read(false), {
+      command: "COMMAND",
+      shouldSaveCommand: true,
+      shouldOpenNewEditor: false,
+    });
 
-  it("shows inputBox right away if there is no commands recorded in the history", async () => {
-    const vscodeWindow = mockMethods<typeof vscode.window>([
-      "showInputBox",
-      "showQuickPick",
-    ]);
-    when(
-      vscodeWindow.showInputBox({
-        placeHolder: "Enter a command",
-        prompt: "No history available yet",
-      }),
-      // @ts-expect-error interface issue
-    ).thenResolve("COMMAND");
-    const historyStore = mockType<HistoryStore>({ getAll: () => [] });
-    const reader = new CommandReader(
-      historyStore,
-      vscodeWindow,
-      workspaceAdapter,
-    );
-    const command = await reader.read(false);
-
-    assert.deepStrictEqual(command, "COMMAND");
-    verify(vscodeWindow.showQuickPick(any()), {
-      times: 0,
-      ignoreExtraArgs: true,
+    assert.deepStrictEqual(await reader.read(true), {
+      command: "COMMAND",
+      shouldSaveCommand: true,
+      shouldOpenNewEditor: true,
     });
   });
 
-  it("shows inputBox if history command picker is dismissed", async () => {
-    const vscodeWindow = mockMethods<typeof vscode.window>(["showInputBox"], {
-      showQuickPick: () => Promise.resolve(),
+  describe("makeSuggestions", () => {
+    it("returns empty suggestions", async () => {
+      const testee = new CommandReader(
+        makeHistoryStore([]),
+        makeVsWindow(),
+        makeWorkspaceAdapter([]),
+      );
+      await testee.init();
+      assert.deepStrictEqual(testee.makeSuggestions(), []);
     });
-    when(
-      vscodeWindow.showInputBox({ placeHolder: "Enter a command" }),
-      // @ts-expect-error interface issue
-    ).thenResolve("COMMAND");
 
-    const historyStore = mockType<HistoryStore>({
-      getAll: () => ["COMMAND_1", "COMMAND_2"],
+    it("returns suggestions", async () => {
+      const testee = new CommandReader(
+        makeHistoryStore(["COMMAND_1", "COMMAND_2"]),
+        makeVsWindow(),
+        makeWorkspaceAdapter([
+          { command: "FAVORITE_1", id: "my_fav_1" },
+          { command: "FAVORITE_2", id: "my_fav_2" },
+        ]),
+      );
+      await testee.init();
+      assert.deepStrictEqual(testee.makeSuggestions(), [
+        testee.makeHistoryMessageItem("COMMAND_1"),
+        testee.makeHistoryMessageItem("COMMAND_2"),
+        testee.makeFavoriteMessageItem({
+          command: "FAVORITE_1",
+          id: "my_fav_1",
+        }),
+        testee.makeFavoriteMessageItem({
+          command: "FAVORITE_2",
+          id: "my_fav_2",
+        }),
+      ]);
     });
-    const reader = new CommandReader(
-      historyStore,
-      vscodeWindow,
-      workspaceAdapter,
-    );
-    const command = await reader.read(false);
 
-    assert.deepStrictEqual(command, "COMMAND");
+    it("returns suggestions if asked", async () => {
+      const testee = new CommandReader(
+        makeHistoryStore(["COMMAND_1", "COMMAND_2"]),
+        makeVsWindow(),
+        makeWorkspaceAdapter([
+          { command: "FAVORITE_1", id: "my_fav_1" },
+          { command: "FAVORITE_2", id: "my_fav_2" },
+        ]),
+      );
+      await testee.init();
+
+      testee.toggleShowHistory();
+      assert.deepStrictEqual(testee.makeSuggestions(), [
+        testee.makeFavoriteMessageItem({
+          command: "FAVORITE_1",
+          id: "my_fav_1",
+        }),
+        testee.makeFavoriteMessageItem({
+          command: "FAVORITE_2",
+          id: "my_fav_2",
+        }),
+      ]);
+
+      testee.toggleShowHistory();
+      testee.toggleShowFavorite();
+      assert.deepStrictEqual(testee.makeSuggestions(), [
+        testee.makeHistoryMessageItem("COMMAND_1"),
+        testee.makeHistoryMessageItem("COMMAND_2"),
+      ]);
+    });
   });
+
+  function makeWorkspaceAdapter(favoriteCommands: FavoriteCommand[]) {
+    return mockType<Workspace>({
+      getConfig: (key: string) => {
+        if (key === "favoriteCommands") {
+          return favoriteCommands;
+        } else {
+          throw Error("Not defined config");
+        }
+      },
+    });
+  }
+
+  function makeVsWindow() {
+    return mockMethods<typeof vscode.window>(["createQuickPick"]);
+  }
+
+  function makeHistoryStore(commands: string[]) {
+    return mockType<HistoryStore>({
+      getAll: async () => commands,
+    });
+  }
 });

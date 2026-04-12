@@ -1,4 +1,3 @@
-import { EXTENSION_NAME } from "./const";
 import { Workspace } from "./adapters/workspace";
 import { dirname } from "path";
 import * as os from "os";
@@ -32,9 +31,10 @@ export class ShellCommandExecContext {
    * 3. Default to Home directory
    */
   getCwd(fileUri: vscode.Uri): string {
-    const configPath = `${EXTENSION_NAME}.currentDirectoryKind`;
     const currentDirectoryKind =
-      this.workspaceAdapter.getConfig<CurrentDirectoryKind>(configPath);
+      this.workspaceAdapter.getConfig<CurrentDirectoryKind>(
+        "currentDirectoryKind",
+      );
 
     if (fileUri.scheme == "file") {
       if (currentDirectoryKind == CurrentDirectoryKind.CURRENT_FILE) {

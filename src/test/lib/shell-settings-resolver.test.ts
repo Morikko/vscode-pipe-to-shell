@@ -6,23 +6,23 @@ import { Workspace } from "../../lib/adapters/workspace";
 
 describe("ShellSettingsResolver", () => {
   const workspaceAdapter = mock(Workspace);
-  when(workspaceAdapter.getConfig("editWithShell.shell.linux")).thenReturn(
+  when(workspaceAdapter.getConfig("linux", "shell")).thenReturn(
     "linux_SHELL_PATH",
   );
-  when(workspaceAdapter.getConfig("editWithShell.shell.osx")).thenReturn(
+  when(workspaceAdapter.getConfig("osx", "shell")).thenReturn(
     "osx_SHELL_PATH",
   );
-  when(workspaceAdapter.getConfig("editWithShell.shell.windows")).thenReturn(
+  when(workspaceAdapter.getConfig("windows", "shell")).thenReturn(
     "windows_SHELL_PATH",
   );
-  when(workspaceAdapter.getConfig("editWithShell.shellArgs.linux")).thenReturn([
+  when(workspaceAdapter.getConfig("linux", "shellArgs")).thenReturn([
     "LINUX_SHELL_ARGS",
   ]);
-  when(workspaceAdapter.getConfig("editWithShell.shellArgs.osx")).thenReturn([
+  when(workspaceAdapter.getConfig("osx", "shellArgs")).thenReturn([
     "MACOS_SHELL_ARGS",
   ]);
   when(
-    workspaceAdapter.getConfig("editWithShell.shellArgs.windows"),
+    workspaceAdapter.getConfig("windows", "shellArgs"),
   ).thenReturn(["WINDOWS_SHELL_ARGS"]);
 
   it("it returns Linux shell args user specified in their config when run on Linux", () => {
