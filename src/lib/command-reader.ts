@@ -133,9 +133,9 @@ export class CommandReader {
   }
 
   async init() {
-    this.historySuggestions = (await this.historyStore.getAll()).map(
-      this.makeHistoryMessageItem,
-    );
+    this.historySuggestions = (await this.historyStore.getAll())
+      .reverse()
+      .map(this.makeHistoryMessageItem);
     this.favoriteSuggestions = this.workspaceAdapter
       .getConfig<FavoriteCommand[]>("favoriteCommands")
       .map(this.makeFavoriteMessageItem);

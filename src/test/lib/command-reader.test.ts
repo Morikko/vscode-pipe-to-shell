@@ -65,8 +65,8 @@ describe("CommandReader", () => {
       );
       await testee.init();
       assert.deepStrictEqual(testee.makeSuggestions(), [
-        testee.makeHistoryMessageItem("COMMAND_1"),
         testee.makeHistoryMessageItem("COMMAND_2"),
+        testee.makeHistoryMessageItem("COMMAND_1"),
         testee.makeFavoriteMessageItem({
           command: "FAVORITE_1",
           id: "my_fav_1",
@@ -104,8 +104,8 @@ describe("CommandReader", () => {
       testee.toggleShowHistory();
       testee.toggleShowFavorite();
       assert.deepStrictEqual(testee.makeSuggestions(), [
-        testee.makeHistoryMessageItem("COMMAND_1"),
         testee.makeHistoryMessageItem("COMMAND_2"),
+        testee.makeHistoryMessageItem("COMMAND_1"),
       ]);
     });
   });
