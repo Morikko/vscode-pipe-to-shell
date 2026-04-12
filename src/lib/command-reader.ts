@@ -1,7 +1,6 @@
 import { HistoryStore } from "./history-store";
 import * as vscode from "vscode";
 import { Workspace } from "./adapters/workspace";
-import { rejects } from "assert";
 
 export interface FavoriteCommand {
   id: string;
@@ -203,10 +202,10 @@ export class CommandReader {
   }
 
   async pickCommand() {
-    return new Promise<string | undefined>((resolve, reject) => {
-      const disposables: vscode.Disposable[] = [];
+    const disposables: vscode.Disposable[] = [];
 
-      try {
+    try {
+      return await new Promise<string | undefined>((resolve) => {
         const input = this.vsWindow.createQuickPick<MessageItem>();
         this.input = input;
         input.placeholder = "Write a new command or select from the suggestion";
@@ -242,11 +241,9 @@ export class CommandReader {
           input.onDidTriggerButton(this.buttonAction),
         );
         input.show();
-      } catch (e) {
-        reject(e);
-      } finally {
-        disposables.forEach((d) => d.dispose());
-      }
-    });
+      });
+    } finally {
+      disposables.forEach((d) => d.dispose());
+    }
   }
 }

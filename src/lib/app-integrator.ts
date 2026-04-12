@@ -140,8 +140,4 @@ export class AppIntegrator {
     );
     this.context.subscriptions.push(CommandReaderToggleShowHistory);
   }
-
-  integrate() {
-    this.registerCommands();
-  }
 }
