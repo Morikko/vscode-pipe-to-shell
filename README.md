@@ -7,7 +7,7 @@ Leverage your favourite shell commands to edit text.
 ## Features
 
 * Edit the selected text by piping it through shell commands.
-  The same text is also available as an environment variable, `ES_SELECTED`.
+  The same text is also available as an environment variable, `VS_SELECTED`.
 * Insert the output of shell commands at the cursor position.
 * Records command history: you can edit and reuse past commands.
 * Use the shell you like. For example, if you have Bash on Windows, you can specify Bash as your shell for this extension.

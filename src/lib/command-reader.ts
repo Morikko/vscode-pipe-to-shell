@@ -1,7 +1,6 @@
 import { HistoryStore } from "./history-store";
 import * as vscode from "vscode";
 import { Workspace } from "./adapters/workspace";
-import { ObjectMap } from "./types";
 
 export interface FavoriteCommand {
   id: string;

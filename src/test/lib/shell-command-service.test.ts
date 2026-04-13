@@ -9,53 +9,21 @@ import { ChildProcess } from "child_process";
 import { Workspace } from "../../lib/adapters/workspace";
 import Process = NodeJS.Process;
 import * as vscode from "vscode";
+import * as os from "os";
 
 describe("ShellCommandService", () => {
   let spawn_child_process: SpawnWrapper;
   let processRunner: ProcessRunner;
   let service: ShellCommandService;
+  let process: ChildProcess;
   const fileUri = vscode.Uri.file("CURRENT_DIR/CURRENT_FILE");
   const untitledUri = vscode.Uri.from({ scheme: "untitled" });
   const platform = "linux";
 
   beforeEach(() => {
-    const process = mockType<ChildProcess>();
-
+    process = mockType<ChildProcess>();
     spawn_child_process = mockFunction() as SpawnWrapper;
-    when(
-      spawn_child_process("SHELL_PATH", ["SHELL_ARG", "COMMAND_STRING"], any()),
-    ).thenReturn(process);
-    when(
-      spawn_child_process(
-        "SHELL_PATH",
-        ["SHELL_ARG", "COMMAND_TEST_WITH_ENVVARS"],
-        contains({ env: { SOME_ENV_VAR: "..." } }),
-      ),
-    ).thenReturn(process);
-    when(
-      spawn_child_process(
-        "SHELL_PATH",
-        ["SHELL_ARG", "COMMAND_TEST_WITH_EXPOSE_INPUT_AS_ENVVAR"],
-        contains({ env: { ES_SELECTED: "SELECTED_TEXT" } }),
-      ),
-    ).thenReturn(process);
-    when(
-      spawn_child_process(
-        "SHELL_PATH",
-        ["SHELL_ARG", "COMMAND_TEST_WITH_EXEC_DIR"],
-        contains({ cwd: "CURRENT_DIR" }),
-      ),
-    ).thenReturn(process);
-
     processRunner = mock(ProcessRunner);
-    when(processRunner.run(process, "")).thenResolve("COMMAND_OUTPUT");
-    when(processRunner.run(process, "SELECTED_TEXT")).thenResolve(
-      "COMMAND_OUTPUT_TEST_WITH_INPUT",
-    );
-    when(processRunner.run(process, "CAUSE_ERROR_INPUT")).thenReject(
-      new Error("UNEXPECTED_ERROR"),
-    );
-
     const workspace = mock(Workspace);
     when(workspace.getConfig(platform, "shell")).thenReturn("SHELL_PATH");
     when(workspace.getConfig(platform, "shellArgs")).thenReturn(["SHELL_ARG"]);
@@ -73,6 +41,11 @@ describe("ShellCommandService", () => {
   });
 
   it("runs a given command on shell", async () => {
+    when(
+      spawn_child_process("SHELL_PATH", ["SHELL_ARG", "COMMAND_STRING"], any()),
+    ).thenReturn(process);
+    when(processRunner.run(process, "")).thenResolve("COMMAND_OUTPUT");
+
     const params = {
       command: "COMMAND_STRING",
       input: "",
@@ -84,6 +57,13 @@ describe("ShellCommandService", () => {
   });
 
   it("passes selected text in the editor to the command", async () => {
+    when(
+      spawn_child_process("SHELL_PATH", ["SHELL_ARG", "COMMAND_STRING"], any()),
+    ).thenReturn(process);
+    when(processRunner.run(process, "SELECTED_TEXT")).thenResolve(
+      "COMMAND_OUTPUT_TEST_WITH_INPUT",
+    );
+
     const params = {
       command: "COMMAND_STRING",
       input: "SELECTED_TEXT",
@@ -95,6 +75,18 @@ describe("ShellCommandService", () => {
   });
 
   it("inherits environment variables on executing a command", async () => {
+    when(
+      spawn_child_process(
+        "SHELL_PATH",
+        ["SHELL_ARG", "COMMAND_TEST_WITH_ENVVARS"],
+        {
+          cwd: os.homedir(),
+          env: { SOME_ENV_VAR: "..." },
+        },
+      ),
+    ).thenReturn(process);
+    when(processRunner.run(process, "")).thenResolve("COMMAND_OUTPUT");
+
     const params = {
       command: "COMMAND_TEST_WITH_ENVVARS",
       input: "",
@@ -106,17 +98,38 @@ describe("ShellCommandService", () => {
   });
 
   it("also exposes a selected text as an environment variable", async () => {
+    when(
+      spawn_child_process(
+        "SHELL_PATH",
+        ["SHELL_ARG", "COMMAND_TEST_WITH_VS_SELECTED_AS_ENVVAR"],
+        {
+          cwd: os.homedir(),
+          env: { VS_SELECTED: "SELECTED_TEXT", SOME_ENV_VAR: "..." },
+        },
+      ),
+    ).thenReturn(process);
+    when(processRunner.run(process, "")).thenResolve("COMMAND_OUTPUT");
+
     const params = {
-      command: "COMMAND_TEST_WITH_EXPOSE_INPUT_AS_ENVVAR",
+      command: "COMMAND_TEST_WITH_VS_SELECTED_AS_ENVVAR",
       input: "SELECTED_TEXT",
       fileUri: untitledUri,
     };
     const output = await service.runCommand(params);
 
-    assert.deepStrictEqual(output, "COMMAND_OUTPUT_TEST_WITH_INPUT");
+    assert.deepStrictEqual(output, "COMMAND_OUTPUT");
   });
 
   it("executes a command on a specific directory", async () => {
+    when(
+      spawn_child_process(
+        "SHELL_PATH",
+        ["SHELL_ARG", "COMMAND_TEST_WITH_EXEC_DIR"],
+        contains({ cwd: "CURRENT_DIR" }),
+      ),
+    ).thenReturn(process);
+    when(processRunner.run(process, "")).thenResolve("COMMAND_OUTPUT");
+
     const params = {
       command: "COMMAND_TEST_WITH_EXEC_DIR",
       input: "",
@@ -128,6 +141,13 @@ describe("ShellCommandService", () => {
   });
 
   it("throws an error if command failed", async () => {
+    when(
+      spawn_child_process("SHELL_PATH", ["SHELL_ARG", "COMMAND_STRING"], any()),
+    ).thenReturn(process);
+    when(processRunner.run(process, "CAUSE_ERROR_INPUT")).thenReject(
+      new Error("UNEXPECTED_ERROR"),
+    );
+
     const params = {
       command: "COMMAND_STRING",
       input: "CAUSE_ERROR_INPUT",

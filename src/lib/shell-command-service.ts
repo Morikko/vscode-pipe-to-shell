@@ -38,6 +38,10 @@ export class ShellCommandService {
     );
   }
 
+  private isCommandEnvSelection(command: string) {
+    return command.includes("VS_SELECTED");
+  }
+
   runCommand(params: CommandParams): Promise<string> {
     const options = this.getOptions(params);
     const shell = this.shellSettingsResolver.shellProgramme();
@@ -47,16 +51,21 @@ export class ShellCommandService {
       [...shellArgs, params.command],
       options,
     );
-    return this.processRunner.run(command, params.input);
+    return this.processRunner.run(
+      command,
+      this.isCommandEnvSelection(params.command) ? "" : params.input,
+    );
   }
 
   private getOptions(params: CommandParams) {
+    const env = { ...this.shellCommandExecContext.env };
+    if (this.isCommandEnvSelection(params.command)) {
+      env["VS_SELECTED"] = params.input;
+    }
+
     return {
       cwd: this.shellCommandExecContext.getCwd(params.fileUri),
-      env: {
-        ...this.shellCommandExecContext.env,
-        ES_SELECTED: params.input,
-      },
+      env: env,
     };
   }
 }
