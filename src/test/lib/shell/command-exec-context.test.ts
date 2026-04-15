@@ -1,8 +1,8 @@
 import * as assert from "assert";
-import { mockMethods, mockType, when } from "../helper";
+import { mockMethods, mockType, when } from "../../helper";
 
-import { ShellCommandExecContext } from "../../lib/shell-command-exec-context";
-import { Workspace } from "../../lib/adapters/workspace";
+import { ShellCommandExecContext } from "../../../lib/shell/command-exec-context";
+import { Workspace } from "../../../lib/adapters/workspace";
 import * as vscode from "vscode";
 import * as os from "os";
 

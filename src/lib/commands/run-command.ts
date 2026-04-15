@@ -1,9 +1,9 @@
-import { ShellCommandService } from "../shell-command-service";
+import { ShellCommandService } from "../shell/command-service";
 import { HistoryStore } from "../history-store";
 import { Workspace } from "../adapters/workspace";
 import { Editor } from "../adapters/editor";
-import { ExtensionCommand } from "./extension-command";
-import { CommandReader, CommandOptions } from "../command-reader";
+import { ExtensionCommand } from "./command-wrapper";
+import { CommandReader, CommandOptions } from "../shell/command-reader";
 import * as vscode from "vscode";
 
 export class RunCommand implements ExtensionCommand {

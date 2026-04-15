@@ -1,6 +1,6 @@
-import { HistoryStore } from "./history-store";
+import { HistoryStore } from "../history-store";
 import * as vscode from "vscode";
-import { Workspace } from "./adapters/workspace";
+import { Workspace } from "../adapters/workspace";
 
 export interface FavoriteCommand {
   id: string;
@@ -174,13 +174,13 @@ export class CommandReader {
   makeSuggestions() {
     // merge
     if (this.showHistory && this.showFavorite) {
-      let historySuggestions: SuggestionItem[] = [];
+      const historySuggestions: SuggestionItem[] = [];
       const favSugByCmd: { [key: string]: SuggestionItem } = {};
-      for (let fc of this.favoriteSuggestions) {
+      for (const fc of this.favoriteSuggestions) {
         favSugByCmd[fc.label] = fc;
       }
 
-      for (let h of this.historySuggestions) {
+      for (const h of this.historySuggestions) {
         if (h.label in favSugByCmd) {
           historySuggestions.push(favSugByCmd[h.label]);
           delete favSugByCmd[h.label];

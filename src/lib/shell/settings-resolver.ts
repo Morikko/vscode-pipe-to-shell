@@ -1,11 +1,10 @@
-import { Workspace } from "./adapters/workspace";
-import { ObjectMap } from "./types";
+import { Workspace } from "../adapters/workspace";
 
 const OS_KIND = {
   darwin: "osx",
   linux: "linux",
   win32: "windows",
-} as ObjectMap<string>;
+} as { [p: string]: string };
 const DEFAULT_OS_KIND = OS_KIND.linux;
 
 function resolveOsKind(platform: string) {

@@ -6,17 +6,17 @@ import {
   mockType,
   verify,
   when,
-} from "../helper";
-import { Editor, WrapEditor } from "../../lib/adapters/editor";
+} from "../../helper";
+import { Editor, WrapEditor } from "../../../lib/adapters/editor";
 import * as vscode from "vscode";
 import {
   CommandWrap,
   ShowErrorMessage,
   Logger,
   ErrorMessageFormatter,
-} from "../../lib/command-wrap";
-import { ExtensionCommand } from "../../lib/commands/extension-command";
-import { CommandExecutionError } from "../../lib/errors";
+  ExtensionCommand,
+} from "../../../lib/commands/command-wrapper";
+import { CommandExecutionError } from "../../../lib/errors";
 import * as assert from "assert";
 
 describe("ErrorMessageFormatter", () => {

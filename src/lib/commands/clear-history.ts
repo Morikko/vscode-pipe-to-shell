@@ -1,5 +1,5 @@
 import { HistoryStore } from "../history-store";
-import { ExtensionCommand } from "./extension-command";
+import { ExtensionCommand } from "./command-wrapper";
 
 export class ClearHistoryCommand implements ExtensionCommand {
   constructor(private readonly historyStore: HistoryStore) {}

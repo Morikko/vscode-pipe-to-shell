@@ -1,15 +1,14 @@
 import { Editor } from "./adapters/editor";
-import { ShellCommandService } from "./shell-command-service";
-import { CommandReader } from "./command-reader";
+import { ShellCommandService } from "./shell/command-service";
+import { CommandReader } from "./shell/command-reader";
 import { HistoryStore } from "./history-store";
-import { ProcessRunner } from "./process-runner";
+import { ProcessRunner } from "./shell/process-runner";
 import { RunCommand } from "./commands/run-command";
 import { ClearHistoryCommand } from "./commands/clear-history";
 import { Workspace as WorkspaceAdapter } from "./adapters/workspace";
 import * as vscode from "vscode";
 import { Position, Range, TextEditor as VsTextEditor } from "vscode";
-import { ExtensionCommand } from "./commands/extension-command";
-import { CommandWrap } from "./command-wrap";
+import { ExtensionCommand, CommandWrap } from "./commands/command-wrapper";
 import { EXTENSION_NAME } from "./const";
 
 import * as childProcess from "child_process";

@@ -1,8 +1,8 @@
 import { ProcessRunner } from "./process-runner";
-import { ShellCommandExecContext } from "./shell-command-exec-context";
-import { ShellSettingsResolver } from "./shell-settings-resolver";
+import { ShellCommandExecContext } from "./command-exec-context";
+import { ShellSettingsResolver } from "./settings-resolver";
 import { ChildProcess, SpawnOptionsWithoutStdio } from "child_process";
-import { Workspace } from "./adapters/workspace";
+import { Workspace } from "../adapters/workspace";
 import * as vscode from "vscode";
 
 import Process = NodeJS.Process;

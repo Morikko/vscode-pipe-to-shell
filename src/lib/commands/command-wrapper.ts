@@ -1,7 +1,11 @@
-import { WrapEditor } from "./adapters/editor";
+import { WrapEditor } from "../adapters/editor";
 import { TextEditor as VsTextEditor } from "vscode";
-import { CommandExecutionError } from "./errors";
-import { ExtensionCommand } from "./commands/extension-command";
+import { CommandExecutionError } from "../errors";
+import { Editor } from "../adapters/editor";
+
+export interface ExtensionCommand {
+  execute(editor?: Editor): Promise<void>;
+}
 
 export type ShowErrorMessage = (
   message: string,

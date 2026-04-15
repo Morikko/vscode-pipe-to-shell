@@ -1,12 +1,19 @@
 import * as assert from "assert";
-import { any, contains, mock, mockFunction, mockType, when } from "../helper";
+import {
+  any,
+  contains,
+  mock,
+  mockFunction,
+  mockType,
+  when,
+} from "../../helper";
 import {
   ShellCommandService,
   SpawnWrapper,
-} from "../../lib/shell-command-service";
-import { ProcessRunner } from "../../lib/process-runner";
+} from "../../../lib/shell/command-service";
+import { ProcessRunner } from "../../../lib/shell/process-runner";
 import { ChildProcess } from "child_process";
-import { Workspace } from "../../lib/adapters/workspace";
+import { Workspace } from "../../../lib/adapters/workspace";
 import Process = NodeJS.Process;
 import * as vscode from "vscode";
 import * as os from "os";

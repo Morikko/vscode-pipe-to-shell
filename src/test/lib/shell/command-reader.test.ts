@@ -1,14 +1,14 @@
 import * as assert from "assert";
-import { mockMethods, mockType, when } from "../helper";
+import { mockMethods, mockType, when } from "../../helper";
 
 import {
   CommandReader,
   FavoriteCommand,
   SuggestionItem,
-} from "../../lib/command-reader";
+} from "../../../lib/shell/command-reader";
 import * as vscode from "vscode";
-import { HistoryStore } from "../../lib/history-store";
-import { Workspace } from "../../lib/adapters/workspace";
+import { HistoryStore } from "../../../lib/history-store";
+import { Workspace } from "../../../lib/adapters/workspace";
 
 describe("CommandReader", () => {
   describe("user input", () => {

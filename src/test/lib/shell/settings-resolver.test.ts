@@ -1,17 +1,15 @@
 import * as assert from "assert";
-import { mock, when } from "../helper";
+import { mock, when } from "../../helper";
 
-import { ShellSettingsResolver } from "../../lib/shell-settings-resolver";
-import { Workspace } from "../../lib/adapters/workspace";
+import { ShellSettingsResolver } from "../../../lib/shell/settings-resolver";
+import { Workspace } from "../../../lib/adapters/workspace";
 
 describe("ShellSettingsResolver", () => {
   const workspaceAdapter = mock(Workspace);
   when(workspaceAdapter.getConfig("linux", "shell")).thenReturn(
     "linux_SHELL_PATH",
   );
-  when(workspaceAdapter.getConfig("osx", "shell")).thenReturn(
-    "osx_SHELL_PATH",
-  );
+  when(workspaceAdapter.getConfig("osx", "shell")).thenReturn("osx_SHELL_PATH");
   when(workspaceAdapter.getConfig("windows", "shell")).thenReturn(
     "windows_SHELL_PATH",
   );
@@ -21,9 +19,9 @@ describe("ShellSettingsResolver", () => {
   when(workspaceAdapter.getConfig("osx", "shellArgs")).thenReturn([
     "MACOS_SHELL_ARGS",
   ]);
-  when(
-    workspaceAdapter.getConfig("windows", "shellArgs"),
-  ).thenReturn(["WINDOWS_SHELL_ARGS"]);
+  when(workspaceAdapter.getConfig("windows", "shellArgs")).thenReturn([
+    "WINDOWS_SHELL_ARGS",
+  ]);
 
   it("it returns Linux shell args user specified in their config when run on Linux", () => {
     const shellArgsRetriever = createShellSettingsResolver("linux");

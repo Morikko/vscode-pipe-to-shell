@@ -1,11 +1,10 @@
-import { Workspace } from "./adapters/workspace";
+import { Workspace } from "../adapters/workspace";
 import { dirname } from "path";
 import * as os from "os";
 import * as vscode from "vscode";
-import { ObjectMap } from "./types";
 
 export interface EnvVarWrap {
-  env: ObjectMap<string | undefined>;
+  env: { [p: string]: string | undefined };
 }
 
 enum CurrentDirectoryKind {
