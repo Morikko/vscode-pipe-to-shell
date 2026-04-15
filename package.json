@@ -154,6 +154,11 @@
             "/s",
             "/c"
           ]
+        },
+        "editWithShell.shell.env": {
+          "description": "An object where the key is a environment variable name and the value its value",
+          "type": "object",
+          "default": {}
         }
       }
     }

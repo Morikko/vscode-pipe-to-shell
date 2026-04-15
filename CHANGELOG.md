@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add button to control if command is saved in history
 - Add button to toggle if result is open in a new editor
 - Persistent History
+- Environment variables can be predefined with `env.shell` settings 
 
 ### Changed
 - Merge enter command and history mode

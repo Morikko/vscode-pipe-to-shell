@@ -19,7 +19,10 @@ export class ShellCommandExecContext {
   ) {}
 
   get env() {
-    return this.process.env;
+    return {
+      ...this.process.env,
+      ...this.workspaceAdapter.getConfig<{ [p: string]: string }>("shell.env"),
+    };
   }
 
   /**
