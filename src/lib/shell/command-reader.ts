@@ -1,11 +1,6 @@
 import { HistoryStore } from "../history-store";
 import * as vscode from "vscode";
-import { Workspace } from "../adapters/workspace";
-
-export interface FavoriteCommand {
-  id: string;
-  command: string;
-}
+import { Workspace, FavoriteCommand } from "../adapters/workspace";
 
 export interface CommandOptions {
   command: string | undefined;

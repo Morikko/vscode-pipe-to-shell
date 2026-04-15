@@ -84,16 +84,21 @@
           "default": "currentFile"
         },
         "editWithShell.favoriteCommands": {
-          "description": "Favorite commands always shown in the suggestion",
+          "description": "Favorite commands always shown in the suggestion and assignable to keybindings.",
           "type": "array",
           "items": {
             "type": "object",
             "properties": {
               "id": {
-                "type": "string"
+                "type": "string",
+                "description": "It can be assigned to a keybinding for quick execution"
               },
               "command": {
                 "type": "string"
+              },
+              "name": {
+                "type": "string",
+                "description": "A more human friendly name to show in the suggestion"
               }
             },
             "required": [

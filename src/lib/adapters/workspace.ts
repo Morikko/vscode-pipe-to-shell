@@ -1,6 +1,12 @@
 import * as vscode from "vscode";
 import { EXTENSION_NAME } from "../const";
 
+export interface FavoriteCommand {
+  id: string;
+  name?: string;
+  command: string;
+}
+
 export class Workspace {
   constructor(private readonly vsWorkspace: typeof vscode.workspace) {}
 

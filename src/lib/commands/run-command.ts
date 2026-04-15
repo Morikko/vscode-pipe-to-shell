@@ -6,13 +6,11 @@ import { ExtensionCommand } from "./command-wrapper";
 import { CommandReader, CommandOptions } from "../shell/command-reader";
 import * as vscode from "vscode";
 
-export class RunCommand implements ExtensionCommand {
+export abstract class RunCommand implements ExtensionCommand {
   constructor(
     private readonly shellCommandService: ShellCommandService,
-    private readonly commandReader: CommandReader,
     private readonly historyStore: HistoryStore,
     private readonly workspaceAdapter: Workspace,
-    private readonly inplace: boolean,
   ) {}
 
   async execute(wrappedEditor: Editor) {
@@ -65,7 +63,40 @@ export class RunCommand implements ExtensionCommand {
     return !wrappedEditor.isTextSelected && processEntireText;
   }
 
-  private getCommandText(): Promise<CommandOptions> {
+  protected abstract getCommandText(): Promise<CommandOptions>;
+}
+
+export class InputRunCommand extends RunCommand {
+  constructor(
+    shellCommandService: ShellCommandService,
+    historyStore: HistoryStore,
+    workspaceAdapter: Workspace,
+    private readonly commandReader: CommandReader,
+    private readonly inplace: boolean,
+  ) {
+    super(shellCommandService, historyStore, workspaceAdapter);
+  }
+
+  protected getCommandText(): Promise<CommandOptions> {
     return this.commandReader.read(!this.inplace);
+  }
+}
+
+export class QuickRunCommand extends RunCommand {
+  constructor(
+    shellCommandService: ShellCommandService,
+    historyStore: HistoryStore,
+    workspaceAdapter: Workspace,
+    private readonly command: string,
+  ) {
+    super(shellCommandService, historyStore, workspaceAdapter);
+  }
+
+  protected async getCommandText(): Promise<CommandOptions> {
+    return {
+      command: this.command,
+      shouldOpenNewEditor: false,
+      shouldSaveCommand: true,
+    };
   }
 }

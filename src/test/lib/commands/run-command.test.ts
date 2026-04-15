@@ -1,4 +1,4 @@
-import { RunCommand } from "../../../lib/commands/run-command";
+import { InputRunCommand } from "../../../lib/commands/run-command";
 import { Workspace } from "../../../lib/adapters/workspace";
 import { Editor } from "../../../lib/adapters/editor";
 import { ShellCommandService } from "../../../lib/shell/command-service";
@@ -7,7 +7,7 @@ import { any, mock, mockMethods, mockType, verify, when } from "../../helper";
 import { CommandReader } from "../../../lib/shell/command-reader";
 import * as vscode from "vscode";
 
-describe("RunCommand", () => {
+describe("InputRunCommand", () => {
   const fileUri = vscode.Uri.file("FILE_NAME");
   const partialSelection = new vscode.Selection(
     new vscode.Position(10, 0),
@@ -34,7 +34,7 @@ describe("RunCommand", () => {
 
     let shellCommandService: ShellCommandService;
     let historyStore: HistoryStore;
-    let command: RunCommand;
+    let command: InputRunCommand;
 
     beforeEach(() => {
       shellCommandService = mock(ShellCommandService);
@@ -54,11 +54,11 @@ describe("RunCommand", () => {
       ).thenResolve("COMMAND_OUTPUT_2");
 
       historyStore = mock(HistoryStore);
-      command = new RunCommand(
+      command = new InputRunCommand(
         shellCommandService,
-        commandReader,
         historyStore,
         workspaceAdapter,
+        commandReader,
         true,
       );
     });
@@ -118,7 +118,7 @@ describe("RunCommand", () => {
 
     let shellCommandService: ShellCommandService;
     let historyStore: HistoryStore;
-    let command: RunCommand;
+    let command: InputRunCommand;
 
     beforeEach(() => {
       shellCommandService = mock(ShellCommandService);
@@ -138,11 +138,11 @@ describe("RunCommand", () => {
       ).thenResolve("COMMAND_OUTPUT_2");
 
       historyStore = mock(HistoryStore);
-      command = new RunCommand(
+      command = new InputRunCommand(
         shellCommandService,
-        commandReader,
         historyStore,
         workspaceAdapter,
+        commandReader,
         true,
       );
     });
@@ -183,8 +183,10 @@ describe("RunCommand", () => {
       const historyStore = mock(HistoryStore);
       const shellCommandService = mock(ShellCommandService);
       const editor = mock(Editor);
-      const command = new RunCommand(
+      const command = new InputRunCommand(
         shellCommandService,
+        historyStore,
+        mockType<Workspace>(),
         mockType<CommandReader>({
           read: () =>
             Promise.resolve({
@@ -193,8 +195,6 @@ describe("RunCommand", () => {
               shouldSaveCommand: true,
             }),
         }),
-        historyStore,
-        mockType<Workspace>(),
         true,
       );
 

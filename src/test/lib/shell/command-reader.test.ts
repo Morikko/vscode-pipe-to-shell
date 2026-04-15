@@ -3,12 +3,11 @@ import { mockMethods, mockType, when } from "../../helper";
 
 import {
   CommandReader,
-  FavoriteCommand,
   SuggestionItem,
 } from "../../../lib/shell/command-reader";
 import * as vscode from "vscode";
 import { HistoryStore } from "../../../lib/history-store";
-import { Workspace } from "../../../lib/adapters/workspace";
+import { Workspace, FavoriteCommand } from "../../../lib/adapters/workspace";
 
 describe("CommandReader", () => {
   describe("user input", () => {
