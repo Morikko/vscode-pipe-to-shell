@@ -16,7 +16,7 @@ import {
   ErrorMessageFormatter,
 } from "../../lib/command-wrap";
 import { ExtensionCommand } from "../../lib/commands/extension-command";
-import { CommandExecutionError } from "../../lib/errors/command";
+import { CommandExecutionError } from "../../lib/errors";
 import * as assert from "assert";
 
 describe("ErrorMessageFormatter", () => {

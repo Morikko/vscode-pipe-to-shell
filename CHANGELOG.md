@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Add prettier
   - Use new vscode development setup
 - This extension is based on edit-with-shell v1.3.0
+- Only add `selectedText` as an evn var when it is present in the command. If so,
+  there is no stdin provided.
 
 ### Removed
 - `Quick CommandX` have been removed

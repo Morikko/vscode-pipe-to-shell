@@ -1,6 +1,6 @@
 import { WrapEditor } from "./adapters/editor";
 import { TextEditor as VsTextEditor } from "vscode";
-import { CommandExecutionError } from "./errors/command";
+import { CommandExecutionError } from "./errors";
 import { ExtensionCommand } from "./commands/extension-command";
 
 export type ShowErrorMessage = (

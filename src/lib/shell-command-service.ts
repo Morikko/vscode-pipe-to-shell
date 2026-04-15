@@ -39,7 +39,7 @@ export class ShellCommandService {
   }
 
   private isCommandEnvSelection(command: string) {
-    return command.includes("VS_SELECTED");
+    return command.includes("selectedText");
   }
 
   runCommand(params: CommandParams): Promise<string> {
@@ -60,7 +60,7 @@ export class ShellCommandService {
   private getOptions(params: CommandParams) {
     const env = { ...this.shellCommandExecContext.env };
     if (this.isCommandEnvSelection(params.command)) {
-      env["VS_SELECTED"] = params.input;
+      env["selectedText"] = params.input;
     }
 
     return {

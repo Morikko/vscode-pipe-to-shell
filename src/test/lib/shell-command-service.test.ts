@@ -101,17 +101,17 @@ describe("ShellCommandService", () => {
     when(
       spawn_child_process(
         "SHELL_PATH",
-        ["SHELL_ARG", "COMMAND_TEST_WITH_VS_SELECTED_AS_ENVVAR"],
+        ["SHELL_ARG", "COMMAND_TEST_WITH_selectedText_AS_ENVVAR"],
         {
           cwd: os.homedir(),
-          env: { VS_SELECTED: "SELECTED_TEXT", SOME_ENV_VAR: "..." },
+          env: { selectedText: "SELECTED_TEXT", SOME_ENV_VAR: "..." },
         },
       ),
     ).thenReturn(process);
     when(processRunner.run(process, "")).thenResolve("COMMAND_OUTPUT");
 
     const params = {
-      command: "COMMAND_TEST_WITH_VS_SELECTED_AS_ENVVAR",
+      command: "COMMAND_TEST_WITH_selectedText_AS_ENVVAR",
       input: "SELECTED_TEXT",
       fileUri: untitledUri,
     };

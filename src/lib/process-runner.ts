@@ -1,5 +1,5 @@
 import { ChildProcess } from "child_process";
-import { CommandExecutionError } from "./errors/command";
+import { CommandExecutionError } from "./errors";
 
 export class ProcessRunner {
   run(command: ChildProcess, inputString: string): Promise<string> {
