@@ -5,10 +5,7 @@ import { HistoryStore } from "./history-store";
 import { ProcessRunner } from "./shell/process-runner";
 import { InputRunCommand, QuickRunCommand } from "./commands/run-command";
 import { ClearHistoryCommand } from "./commands/clear-history";
-import {
-  Workspace as WorkspaceAdapter,
-  FavoriteCommand,
-} from "./adapters/workspace";
+import { Workspace as WorkspaceAdapter } from "./adapters/workspace";
 import * as vscode from "vscode";
 import { Position, Range, TextEditor as VsTextEditor } from "vscode";
 import { ExtensionCommand, CommandWrap } from "./commands/command-wrapper";
@@ -32,7 +29,7 @@ export class AppIntegrator {
 
     this.registerPaletteCommands();
     this.registerCommandReaderCommands();
-    this.registerFavoriteCommands();
+    this.registerQuickCommand();
   }
 
   private get runCommandInPlace() {
@@ -154,28 +151,22 @@ export class AppIntegrator {
   }
 
   /**
-   * Register favorite commands so the user can assign keybinding to trigger
-   * them.
+   * Register quick command so the user can assign keybinding to trigger a
+   * favorite command or any custom command.
    */
-  private registerFavoriteCommands() {
-    const favoriteCommands =
-      this.workspaceAdapter.getConfig<FavoriteCommand[]>("favoriteCommands");
-
-    for (const fc of favoriteCommands) {
-      const fcWrapCommand = this.wrapCommand(
-        new QuickRunCommand(
-          this.shellCommandService,
-          this.historyStore,
-          this.workspaceAdapter,
-          fc.command,
-        ),
-      );
-      const fcCommand = vscode.commands.registerTextEditorCommand(
-        `editWithShell.${fc.id}`,
-        fcWrapCommand.execute,
-        fcWrapCommand,
-      );
-      this.context.subscriptions.push(fcCommand);
-    }
+  private registerQuickCommand() {
+    const quickCommand = this.wrapCommand(
+      new QuickRunCommand(
+        this.shellCommandService,
+        this.historyStore,
+        this.workspaceAdapter,
+      ),
+    );
+    const fcCommand = vscode.commands.registerTextEditorCommand(
+      `editWithShell.quickCommand`,
+      quickCommand.execute,
+      quickCommand,
+    );
+    this.context.subscriptions.push(fcCommand);
   }
 }

@@ -1,4 +1,7 @@
-import { InputRunCommand } from "../../../lib/commands/run-command";
+import {
+  InputRunCommand,
+  QuickRunCommand,
+} from "../../../lib/commands/run-command";
 import { Workspace } from "../../../lib/adapters/workspace";
 import { Editor } from "../../../lib/adapters/editor";
 import { ShellCommandService } from "../../../lib/shell/command-service";
@@ -6,6 +9,7 @@ import { HistoryStore } from "../../../lib/history-store";
 import { any, mock, mockMethods, mockType, verify, when } from "../../helper";
 import { CommandReader } from "../../../lib/shell/command-reader";
 import * as vscode from "vscode";
+import * as assert from "assert";
 
 describe("InputRunCommand", () => {
   const fileUri = vscode.Uri.file("FILE_NAME");
@@ -203,6 +207,33 @@ describe("InputRunCommand", () => {
       verify(editor.replaceSelectedTextsWith(any(), any()), { times: 0 });
       verify(shellCommandService.runCommand(any()), { times: 0 });
       verify(historyStore.add(any()), { times: 0 });
+    });
+  });
+});
+
+describe("QuickRunCommand", () => {
+  // const workspaceAdapter = mockType<Workspace>({
+  //   getConfig: (key: string) =>
+  //     key === "processEntireTextIfNoneSelected" && false,
+  // });
+
+  describe("getCommandText", () => {
+    it("should accept a favorite command id", () => {});
+
+    it("should accept any input command", () => {});
+
+    it("should accept a command option with a favorite command id", () => {});
+
+    it("should accept a command option with any input command", () => {});
+
+    it("should error on any other type", async () => {
+      const quickCommand = new QuickRunCommand(
+        mock(ShellCommandService),
+        mock(HistoryStore),
+        mock(Workspace),
+      );
+      await assert.rejects(quickCommand["getCommandText"](), Error);
+      await assert.rejects(quickCommand["getCommandText"](true), Error);
     });
   });
 });

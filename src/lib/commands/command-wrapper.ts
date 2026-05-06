@@ -2,9 +2,10 @@ import { WrapEditor } from "../adapters/editor";
 import { TextEditor as VsTextEditor } from "vscode";
 import { CommandExecutionError } from "../errors";
 import { Editor } from "../adapters/editor";
+import { CommandOptions } from "../shell/command-reader";
 
 export interface ExtensionCommand {
-  execute(editor?: Editor): Promise<void>;
+  execute(editor?: Editor, args?: unknown): Promise<void>;
 }
 
 export type ShowErrorMessage = (
@@ -33,9 +34,13 @@ export class CommandWrap {
     this.errorMessageFormatter = new ErrorMessageFormatter();
   }
 
-  async execute(editor?: VsTextEditor) {
+  async execute(
+    editor?: VsTextEditor,
+    _edit?: unknown,
+    args?: string | CommandOptions,
+  ) {
     try {
-      await this.command.execute(editor && this.wrapEditor(editor));
+      await this.command.execute(editor && this.wrapEditor(editor), args);
     } catch (e) {
       if (e instanceof Error) {
         this.handleError(e);

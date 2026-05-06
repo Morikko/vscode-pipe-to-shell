@@ -1,21 +1,27 @@
 import { ShellCommandService } from "../shell/command-service";
 import { HistoryStore } from "../history-store";
-import { Workspace } from "../adapters/workspace";
+import { Workspace, FavoriteCommand } from "../adapters/workspace";
 import { Editor } from "../adapters/editor";
 import { ExtensionCommand } from "./command-wrapper";
 import { CommandReader, CommandOptions } from "../shell/command-reader";
 import * as vscode from "vscode";
 
+const COMMAND_OPTIONS_KEYS = new Set<string>([
+  "command",
+  "shouldOpenNewEditor",
+  "shouldSaveCommand",
+] satisfies (keyof CommandOptions)[]);
+
 export abstract class RunCommand implements ExtensionCommand {
   constructor(
     private readonly shellCommandService: ShellCommandService,
     private readonly historyStore: HistoryStore,
-    private readonly workspaceAdapter: Workspace,
+    protected readonly workspaceAdapter: Workspace,
   ) {}
 
-  async execute(wrappedEditor: Editor) {
+  async execute(wrappedEditor: Editor, args?: unknown) {
     const { command, shouldOpenNewEditor, shouldSaveCommand } =
-      await this.getCommandText();
+      await this.getCommandText(args);
     if (!command) return;
 
     if (shouldSaveCommand) {
@@ -63,7 +69,7 @@ export abstract class RunCommand implements ExtensionCommand {
     return !wrappedEditor.isTextSelected && processEntireText;
   }
 
-  protected abstract getCommandText(): Promise<CommandOptions>;
+  protected abstract getCommandText(args?: unknown): Promise<CommandOptions>;
 }
 
 export class InputRunCommand extends RunCommand {
@@ -82,21 +88,82 @@ export class InputRunCommand extends RunCommand {
   }
 }
 
+type WithRequired<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
+
 export class QuickRunCommand extends RunCommand {
   constructor(
     shellCommandService: ShellCommandService,
     historyStore: HistoryStore,
     workspaceAdapter: Workspace,
-    private readonly command: string,
   ) {
     super(shellCommandService, historyStore, workspaceAdapter);
   }
 
-  protected async getCommandText(): Promise<CommandOptions> {
-    return {
-      command: this.command,
-      shouldOpenNewEditor: false,
-      shouldSaveCommand: true,
-    };
+  /**
+   * @param command_or_id Either a favorite command id or a valid shell command
+   * @returns The favorite command if match else the raw command_or_id
+   */
+  private getCommand(command_or_id: string): string {
+    const favoriteCommands =
+      this.workspaceAdapter.getConfig<FavoriteCommand[]>("favoriteCommands");
+    const fc = favoriteCommands.find((fc) => fc.id === command_or_id);
+
+    return fc?.command ?? command_or_id;
+  }
+
+  private isOptionalBoolean(obj: Record<string, unknown>, key: string) {
+    const value = obj[key];
+    if (typeof value === "boolean" || typeof value === "undefined") {
+      return true;
+    } else {
+      throw new Error(`${key} should be an optional boolean and not ${value}`);
+    }
+  }
+
+  private validateCommonOptions(
+    args: unknown,
+  ): args is WithRequired<Partial<CommandOptions>, "command"> {
+    const opts = args as Record<string, unknown>;
+
+    if (typeof opts["command"] !== "string") {
+      throw new Error("command is required and should be a string");
+    }
+    this.isOptionalBoolean(opts, "shouldOpenNewEditor");
+    this.isOptionalBoolean(opts, "shouldSaveCommand");
+
+    const unknownKeys = Object.keys(opts).filter(
+      (key) => !COMMAND_OPTIONS_KEYS.has(key),
+    );
+
+    if (unknownKeys.length > 0) {
+      throw new Error(`Unknown keys: ${unknownKeys}`);
+    }
+
+    return true;
+  }
+
+  protected async getCommandText(args?: unknown): Promise<CommandOptions> {
+    if (typeof args === "string") {
+      return {
+        command: this.getCommand(args),
+        shouldOpenNewEditor: false,
+        shouldSaveCommand: true,
+      };
+    } else if (
+      args !== null &&
+      typeof args === "object" &&
+      this.validateCommonOptions(args)
+    ) {
+      return {
+        shouldOpenNewEditor: false,
+        shouldSaveCommand: true,
+        ...args,
+        command: this.getCommand(args["command"]),
+      };
+    } else {
+      throw new Error(
+        `Invalid args: expected a string or a command options object, got ${args}`,
+      );
+    }
   }
 }

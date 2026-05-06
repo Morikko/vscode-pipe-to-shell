@@ -49,7 +49,9 @@ describe("CommandWrap", () => {
     showErrorMessage = mockFunction() as ShowErrorMessage;
 
     command = mockMethods<ExtensionCommand>(["execute"]);
-    when(command.execute(badEditor)).thenReject(new Error("UNEXPECTED_ERROR"));
+    when(command.execute(badEditor, undefined)).thenReject(
+      new Error("UNEXPECTED_ERROR"),
+    );
 
     commandWrap = new CommandWrap(
       command,
@@ -62,7 +64,7 @@ describe("CommandWrap", () => {
   it("invokes wrapped command with wrapped editor", async () => {
     await commandWrap.execute(rowGoodEditor);
 
-    verify(command.execute(goodEditor));
+    verify(command.execute(goodEditor, undefined));
   });
 
   it("reports an error", async () => {
@@ -79,7 +81,7 @@ describe("CommandWrap", () => {
       "test-command",
       "COMMAND_ERROR_OUTPUT",
     );
-    when(command.execute(badEditor)).thenReject(commandError);
+    when(command.execute(badEditor, undefined)).thenReject(commandError);
 
     await commandWrap.execute(rowBadEditor);
 
@@ -94,7 +96,7 @@ describe("CommandWrap", () => {
       "test-command",
       "",
     );
-    when(command.execute(badEditor)).thenReject(commandError);
+    when(command.execute(badEditor, undefined)).thenReject(commandError);
 
     await commandWrap.execute(rowBadEditor);
 

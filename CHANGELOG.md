@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add button to toggle if result is open in a new editor
 - Persistent History
 - Environment variables can be predefined with `env.shell` settings 
+- Add `editWithShell.quickCommand` command to use in keybinding definition. It
+  either accept a favorite command id or a custom shell command.
 
 ### Changed
 - Merge enter command and history mode
@@ -29,5 +31,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   there is no stdin provided.
 
 ### Removed
-- `Quick CommandX` have been removed
-- 
+- `Quick CommandX` commands have been removed

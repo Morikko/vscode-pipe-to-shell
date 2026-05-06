@@ -27,7 +27,8 @@
   ],
   "activationEvents": [
     "onCommand:editWithShell.clearCommandHistory",
-    "onCommand:editWithShell.runCommand"
+    "onCommand:editWithShell.runCommand",
+    "onCommand:editWithShell.quickCommand"
   ],
   "main": "./out/extension.js",
   "contributes": {
