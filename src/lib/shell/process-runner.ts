@@ -32,6 +32,9 @@ export class ProcessRunner {
             ),
           );
         } else {
+          if (stdoutString.endsWith("\n")) {
+            stdoutString = stdoutString.slice(0, -1);
+          }
           resolve(stdoutString);
         }
       });
