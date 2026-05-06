@@ -264,7 +264,7 @@ export class CommandReader {
             resolve(undefined);
             input.dispose();
           }),
-          input.onDidTriggerButton(this.buttonAction),
+          input.onDidTriggerButton(this.buttonAction, this),
         );
         input.show();
       });
