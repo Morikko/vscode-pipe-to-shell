@@ -20,8 +20,12 @@ export abstract class RunCommand implements ExtensionCommand {
   ) {}
 
   async execute(wrappedEditor: Editor, args?: unknown) {
-    const { command, shouldOpenNewEditor, shouldSaveCommand } =
-      await this.getCommandText(args);
+    const {
+      command,
+      shouldOpenNewEditor,
+      shouldSaveCommand,
+      shouldProcessEntireText,
+    } = await this.getCommandText(wrappedEditor.isTextSelected, args);
     if (!command) return;
 
     if (shouldSaveCommand) {
@@ -30,7 +34,7 @@ export abstract class RunCommand implements ExtensionCommand {
 
     let inputTexts: string[];
     let selections: readonly vscode.Selection[];
-    if (this.shouldPassEntireText(wrappedEditor)) {
+    if (!wrappedEditor.isTextSelected && shouldProcessEntireText) {
       inputTexts = [wrappedEditor.entireText];
       selections = wrappedEditor.entireSelection;
     } else {
@@ -62,14 +66,10 @@ export abstract class RunCommand implements ExtensionCommand {
     return Promise.all(promiseOfCommandOutputs);
   }
 
-  private shouldPassEntireText(wrappedEditor: Editor): boolean {
-    const processEntireText = this.workspaceAdapter.getConfig<boolean>(
-      "processEntireTextIfNoneSelected",
-    );
-    return !wrappedEditor.isTextSelected && processEntireText;
-  }
-
-  protected abstract getCommandText(args?: unknown): Promise<CommandOptions>;
+  protected abstract getCommandText(
+    isTextSelected: boolean,
+    args?: unknown,
+  ): Promise<CommandOptions>;
 }
 
 export class InputRunCommand extends RunCommand {
@@ -83,8 +83,8 @@ export class InputRunCommand extends RunCommand {
     super(shellCommandService, historyStore, workspaceAdapter);
   }
 
-  protected getCommandText(): Promise<CommandOptions> {
-    return this.commandReader.read(!this.inplace);
+  protected getCommandText(isTextSelected: boolean): Promise<CommandOptions> {
+    return this.commandReader.read(!this.inplace, isTextSelected);
   }
 }
 
@@ -142,12 +142,22 @@ export class QuickRunCommand extends RunCommand {
     return true;
   }
 
-  protected async getCommandText(args?: unknown): Promise<CommandOptions> {
+  protected async getCommandText(
+    isTextSelected: boolean,
+    args?: unknown,
+  ): Promise<CommandOptions> {
+    const shouldProcessEntireText = isTextSelected
+      ? false
+      : this.workspaceAdapter.getConfig<boolean>(
+          "processEntireTextIfNoneSelected",
+        );
+
     if (typeof args === "string") {
       return {
         command: this.getCommand(args),
         shouldOpenNewEditor: false,
         shouldSaveCommand: true,
+        shouldProcessEntireText: shouldProcessEntireText,
       };
     } else if (
       args !== null &&
@@ -157,6 +167,7 @@ export class QuickRunCommand extends RunCommand {
       return {
         shouldOpenNewEditor: false,
         shouldSaveCommand: true,
+        shouldProcessEntireText: shouldProcessEntireText,
         ...args,
         command: this.getCommand(args["command"]),
       };

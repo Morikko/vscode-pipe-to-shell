@@ -69,6 +69,11 @@
         "command": "editWithShell.CommandReaderToggleShowHistory",
         "key": "ctrl+h",
         "when": "editWithShell.CommandReaderOpen"
+      },
+      {
+        "command": "editWithShell.CommandReaderToggleProcessEntireText",
+        "key": "ctrl+g",
+        "when": "editWithShell.CommandReaderOpen"
       }
     ],
     "configuration": {

@@ -6,6 +6,7 @@ export interface CommandOptions {
   command: string | undefined;
   shouldOpenNewEditor: boolean;
   shouldSaveCommand: boolean;
+  shouldProcessEntireText: boolean;
 }
 
 export class SuggestionItem implements vscode.QuickPickItem {
@@ -32,6 +33,17 @@ class NewEditorButton implements vscode.QuickInputButton {
   iconPath = new vscode.ThemeIcon("new-file");
   location = vscode.QuickInputButtonLocation.Inline;
   toggle = { checked: false };
+
+  constructor(readonly checked: boolean) {
+    this.toggle.checked = checked;
+  }
+}
+
+class ProcessEntireSelectionButton implements vscode.QuickInputButton {
+  tooltip = "Process entire text or no selection (Ctrl+G)";
+  iconPath = new vscode.ThemeIcon("selection");
+  location = vscode.QuickInputButtonLocation.Inline;
+  toggle = { checked: true };
 
   constructor(readonly checked: boolean) {
     this.toggle.checked = checked;
@@ -67,6 +79,10 @@ export class CommandReader {
   private showFavorite: boolean = true;
   private shouldSaveCommand: boolean = true;
   private shouldOpenNewEditor: boolean = false;
+  // Only when no selection
+  private shouldProcessEntireText: boolean = false;
+  // The option above is only configurable if the next one is set to false
+  private isTextSelected: boolean = false;
   private input: vscode.QuickPick<SuggestionItem> | undefined = undefined;
 
   constructor(
@@ -81,6 +97,15 @@ export class CommandReader {
     }
 
     this.shouldOpenNewEditor = !this.shouldOpenNewEditor;
+    this.input.buttons = this.makeButtons();
+  }
+
+  togglesProcessEntireText() {
+    if (this.input === undefined) {
+      return;
+    }
+
+    this.shouldProcessEntireText = !this.shouldProcessEntireText;
     this.input.buttons = this.makeButtons();
   }
 
@@ -141,9 +166,20 @@ export class CommandReader {
     this.showHistory = true;
     this.showFavorite = true;
     this.shouldSaveCommand = true;
+    if (this.isTextSelected) {
+      this.shouldProcessEntireText = false;
+    } else {
+      this.shouldProcessEntireText = this.workspaceAdapter.getConfig<boolean>(
+        "processEntireTextIfNoneSelected",
+      );
+    }
   }
 
-  async read(shouldOpenNewEditor: boolean): Promise<CommandOptions> {
+  async read(
+    shouldOpenNewEditor: boolean,
+    isTextSelected: boolean,
+  ): Promise<CommandOptions> {
+    this.isTextSelected = isTextSelected;
     await this.init();
     this.shouldOpenNewEditor = shouldOpenNewEditor;
     try {
@@ -156,6 +192,7 @@ export class CommandReader {
         command: await this.pickCommand(),
         shouldSaveCommand: this.shouldSaveCommand,
         shouldOpenNewEditor: this.shouldOpenNewEditor,
+        shouldProcessEntireText: this.shouldProcessEntireText,
       };
     } finally {
       vscode.commands.executeCommand(
@@ -194,12 +231,20 @@ export class CommandReader {
   }
 
   makeButtons() {
-    return [
+    const buttons = [
       new ShowHistoryButton(this.showHistory),
       new ShowFavoriteButton(this.showFavorite),
       new NewEditorButton(this.shouldOpenNewEditor),
       new SaveButton(this.shouldSaveCommand),
     ];
+
+    if (!this.isTextSelected) {
+      buttons.push(
+        new ProcessEntireSelectionButton(this.shouldProcessEntireText),
+      );
+    }
+
+    return buttons;
   }
 
   buttonAction(button: vscode.QuickInputButton) {
@@ -217,6 +262,8 @@ export class CommandReader {
       this.shouldSaveCommand = button.toggle.checked;
     } else if (button instanceof NewEditorButton) {
       this.shouldOpenNewEditor = button.toggle.checked;
+    } else if (button instanceof ProcessEntireSelectionButton) {
+      this.shouldProcessEntireText = button.toggle.checked;
     }
   }
 

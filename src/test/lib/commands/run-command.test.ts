@@ -232,8 +232,8 @@ describe("QuickRunCommand", () => {
         mock(HistoryStore),
         mock(Workspace),
       );
-      await assert.rejects(quickCommand["getCommandText"](), Error);
       await assert.rejects(quickCommand["getCommandText"](true), Error);
+      await assert.rejects(quickCommand["getCommandText"](true, true), Error);
     });
   });
 });

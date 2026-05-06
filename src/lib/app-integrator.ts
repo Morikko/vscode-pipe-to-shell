@@ -148,6 +148,15 @@ export class AppIntegrator {
       },
     );
     this.context.subscriptions.push(CommandReaderToggleShowHistory);
+
+    const CommandReaderToggleProcessEntireText =
+      vscode.commands.registerCommand(
+        "editWithShell.CommandReaderToggleProcessEntireText",
+        () => {
+          this.commandReader.togglesProcessEntireText();
+        },
+      );
+    this.context.subscriptions.push(CommandReaderToggleProcessEntireText);
   }
 
   /**

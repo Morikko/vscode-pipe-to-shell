@@ -20,13 +20,13 @@ describe("CommandReader", () => {
         makeWorkspaceAdapter([]),
       );
 
-      assert.deepStrictEqual(await reader.read(false), {
+      assert.deepStrictEqual(await reader.read(false, true), {
         command: "COMMAND",
         shouldSaveCommand: true,
         shouldOpenNewEditor: false,
       });
 
-      assert.deepStrictEqual(await reader.read(true), {
+      assert.deepStrictEqual(await reader.read(true, true), {
         command: "COMMAND",
         shouldSaveCommand: true,
         shouldOpenNewEditor: true,
@@ -45,7 +45,7 @@ describe("CommandReader", () => {
         makeWorkspaceAdapter([]),
       );
 
-      assert.deepStrictEqual(await reader.read(false), {
+      assert.deepStrictEqual(await reader.read(false, true), {
         command: "ACTIVE_COMMAND",
         shouldSaveCommand: true,
         shouldOpenNewEditor: false,
