@@ -1,7 +1,11 @@
 import * as vscode from "vscode";
+import { Workspace } from "./adapters/workspace";
 
 export class HistoryStore {
-  constructor(private context: vscode.ExtensionContext) {}
+  constructor(
+    private context: vscode.ExtensionContext,
+    private workspaceAdapter: Workspace,
+  ) {}
 
   getAll() {
     return this.loadHistory();
@@ -29,11 +33,24 @@ export class HistoryStore {
     await this.saveHistory(newHistory);
   }
 
+  private async getMaxSize(): Promise<number> {
+    return this.workspaceAdapter.getConfig<number>("historyMaxSize");
+  }
+
   private async loadHistory(): Promise<string[]> {
     return this.context.globalState.get<string[]>("history") || [];
   }
 
+  async truncateMaxSize() {
+    await this.saveHistory(await this.getAll());
+  }
+
   private async saveHistory(history: string[]) {
+    const maxSize = await this.getMaxSize();
+    if (history.length > maxSize) {
+      history = history.slice(history.length - maxSize);
+    }
+
     return this.context.globalState.update("history", history);
   }
 }

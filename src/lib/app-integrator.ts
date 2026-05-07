@@ -19,8 +19,8 @@ export class AppIntegrator {
   private commandReader: CommandReader;
 
   constructor(private context: vscode.ExtensionContext) {
-    this.historyStore = new HistoryStore(context);
     this.workspaceAdapter = new WorkspaceAdapter(vscode.workspace);
+    this.historyStore = new HistoryStore(context, this.workspaceAdapter);
     this.commandReader = new CommandReader(
       this.historyStore,
       vscode.window,
@@ -30,6 +30,14 @@ export class AppIntegrator {
     this.registerPaletteCommands();
     this.registerCommandReaderCommands();
     this.registerQuickCommand();
+
+    context.subscriptions.push(
+      vscode.workspace.onDidChangeConfiguration((event) => {
+        if (event.affectsConfiguration("editWithShell.historyMaxSize")) {
+          this.historyStore.truncateMaxSize();
+        }
+      }),
+    );
   }
 
   private get runCommandInPlace() {

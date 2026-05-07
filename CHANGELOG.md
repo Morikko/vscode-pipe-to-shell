@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add button to toggle if result is open in a new editor
 - Add button when the selection is empty to toggle if all the text must be
   selected
-- Persistent History
+- Persistent history with a customizable maximum size
 - Environment variables can be predefined with `env.shell` settings 
 - Add `editWithShell.quickCommand` command to use in keybinding definition. It
   either accept a favorite command id or a custom shell command.

@@ -170,6 +170,11 @@
           "description": "An object where the key is a environment variable name and the value its value",
           "type": "object",
           "default": {}
+        },
+        "editWithShell.historyMaxSize": {
+          "description": "The number of executed commands save",
+          "type": "integer",
+          "default": 100
         }
       }
     }
