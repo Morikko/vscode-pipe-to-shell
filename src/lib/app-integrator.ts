@@ -33,7 +33,7 @@ export class AppIntegrator {
 
     context.subscriptions.push(
       vscode.workspace.onDidChangeConfiguration((event) => {
-        if (event.affectsConfiguration("editWithShell.historyMaxSize")) {
+        if (event.affectsConfiguration("pipeToShell.historyMaxSize")) {
           this.historyStore.truncateMaxSize();
         }
       }),
@@ -126,7 +126,7 @@ export class AppIntegrator {
    */
   private registerCommandReaderCommands() {
     const CommandReaderToggleNewEditor = vscode.commands.registerCommand(
-      "editWithShell.CommandReaderToggleNewEditor",
+      "pipeToShell.CommandReaderToggleNewEditor",
       () => {
         this.commandReader.toggleOpenNewEditor();
       },
@@ -134,7 +134,7 @@ export class AppIntegrator {
     this.context.subscriptions.push(CommandReaderToggleNewEditor);
 
     const CommandReaderToggleSaveHistory = vscode.commands.registerCommand(
-      "editWithShell.CommandReaderToggleSaveHistory",
+      "pipeToShell.CommandReaderToggleSaveHistory",
       () => {
         this.commandReader.toggleSaveHistory();
       },
@@ -142,7 +142,7 @@ export class AppIntegrator {
     this.context.subscriptions.push(CommandReaderToggleSaveHistory);
 
     const CommandReaderToggleShowFavorite = vscode.commands.registerCommand(
-      "editWithShell.CommandReaderToggleShowFavorite",
+      "pipeToShell.CommandReaderToggleShowFavorite",
       () => {
         this.commandReader.toggleShowFavorite();
       },
@@ -150,7 +150,7 @@ export class AppIntegrator {
     this.context.subscriptions.push(CommandReaderToggleShowFavorite);
 
     const CommandReaderToggleShowHistory = vscode.commands.registerCommand(
-      "editWithShell.CommandReaderToggleShowHistory",
+      "pipeToShell.CommandReaderToggleShowHistory",
       () => {
         this.commandReader.toggleShowHistory();
       },
@@ -159,7 +159,7 @@ export class AppIntegrator {
 
     const CommandReaderToggleProcessEntireText =
       vscode.commands.registerCommand(
-        "editWithShell.CommandReaderToggleProcessEntireText",
+        "pipeToShell.CommandReaderToggleProcessEntireText",
         () => {
           this.commandReader.togglesProcessEntireText();
         },
@@ -180,7 +180,7 @@ export class AppIntegrator {
       ),
     );
     const fcCommand = vscode.commands.registerTextEditorCommand(
-      `editWithShell.quickCommand`,
+      `pipeToShell.quickCommand`,
       quickCommand.execute,
       quickCommand,
     );

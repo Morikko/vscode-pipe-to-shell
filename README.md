@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ryu1kn/vscode-edit-with-shell.svg?branch=master)](https://travis-ci.org/ryu1kn/vscode-edit-with-shell) [![Code Climate](https://codeclimate.com/github/ryu1kn/vscode-edit-with-shell/badges/gpa.svg)](https://codeclimate.com/github/ryu1kn/vscode-edit-with-shell)
+[![Build Status](https://travis-ci.org/morikko/vscode-pipe-to-shell.svg?branch=master)](https://travis-ci.org/morikko/vscode-pipe-to-shell) [![Code Climate](https://codeclimate.com/github/morikko/vscode-pipe-to-shell/badges/gpa.svg)](https://codeclimate.com/github/morikko/vscode-pipe-to-shell)
 
 # Edit with Shell Command
 
@@ -13,15 +13,15 @@ Leverage your favourite shell commands to edit text.
 * Use the shell you like. For example, if you have Bash on Windows, you can specify Bash as your shell for this extension.
 * Support multi cursors.
 
-![Edit with Shell Command](https://raw.githubusercontent.com/ryu1kn/vscode-edit-with-shell/master/images/animations/public.gif)
+![Edit with Shell Command](https://raw.githubusercontent.com/morikko/vscode-pipe-to-shell/master/images/animations/public.gif)
 
-![Insert command output](https://raw.githubusercontent.com/ryu1kn/vscode-edit-with-shell/master/images/animations/insert-command-output.gif)
+![Insert command output](https://raw.githubusercontent.com/morikko/vscode-pipe-to-shell/master/images/animations/insert-command-output.gif)
 
-![Edit and reuse past commands](https://raw.githubusercontent.com/ryu1kn/vscode-edit-with-shell/master/images/animations/edit-and-run-command-history.gif)
+![Edit and reuse past commands](https://raw.githubusercontent.com/morikko/vscode-pipe-to-shell/master/images/animations/edit-and-run-command-history.gif)
 
 ## Request Features or Report Bugs
 
-Feature requests and bug reports are very welcome: https://github.com/ryu1kn/vscode-edit-with-shell/issues
+Feature requests and bug reports are very welcome: https://github.com/morikko/vscode-pipe-to-shell/issues
 
 A couple of requests from me when you raise an github issue.
 
@@ -30,31 +30,31 @@ A couple of requests from me when you raise an github issue.
 
 ## Commands
 
-* `EditWithShell: Run command` (**Command ID:** `editWithShell.runCommand`)
+* `EditWithShell: Run command` (**Command ID:** `pipeToShell.runCommand`)
 
     Show command history and let you select, modify & run a command
 
-* `EditWithShell: Clear Command History` (**Command ID:** `editWithShell.clearCommandHistory`)
+* `EditWithShell: Clear Command History` (**Command ID:** `pipeToShell.clearCommandHistory`)
 
     Clear command history
 
 ## Configurations
 
-* `editWithShell.currentDirectoryKind` (default: `"currentFile"`)
+* `pipeToShell.currentDirectoryKind` (default: `"currentFile"`)
 
     Current directory for shell commands. If the target directory is not available, HOME directory will be used. Possible values: `currentFile` or `workspaceRoot`
 
-* `editWithShell.processEntireTextIfNoneSelected` (default: `false`)
+* `pipeToShell.processEntireTextIfNoneSelected` (default: `false`)
 
     Pipe the entire text to the shell command if no text is selected
 
-* `editWithShell.favoriteCommands` (default: `[]`)
+* `pipeToShell.favoriteCommands` (default: `[]`)
 
     List of commands that are always shown in the suggestion. Each element must
     have a command ID and command. e.g:
 
     ```
-    "editWithShell.favoriteCommands": [
+    "pipeToShell.favoriteCommands": [
       {
         "id": "extract-email-and-sort-on-address-book",
         "command": "cut -d, -f3 | sort"
@@ -67,30 +67,30 @@ A couple of requests from me when you raise an github issue.
     ]
     ```
 
-* `editWithShell.shell.linux` (default: `"/bin/sh"`)
+* `pipeToShell.shell.linux` (default: `"/bin/sh"`)
 
     The path of the shell that this extension uses on Linux
 
-* `editWithShell.shellArgs.linux` (default: `["-c"]`)
+* `pipeToShell.shellArgs.linux` (default: `["-c"]`)
 
     Arguments to the shell to be used on Linux
 
-* `editWithShell.shell.osx` (default: `"/bin/sh"`)
+* `pipeToShell.shell.osx` (default: `"/bin/sh"`)
 
     The path of the shell that this extension uses on macOS
 
-* `editWithShell.shellArgs.osx` (default: `["-c"]`)
+* `pipeToShell.shellArgs.osx` (default: `["-c"]`)
 
     Arguments to the shell to be used on macOS
 
-* `editWithShell.shell.windows` (default: `"cmd.exe"`)
+* `pipeToShell.shell.windows` (default: `"cmd.exe"`)
 
     The path of the shell that this extension uses on Windows
 
     * For PowerShell, you may set this to `"pwsh"`
     * For Bash on WSL (Windows Subsystem for Linux), you may set this to `"wsl"`
 
-* `editWithShell.shellArgs.windows` (default: `["/d", "/s", "/c"]`)
+* `pipeToShell.shellArgs.windows` (default: `["/d", "/s", "/c"]`)
 
     Arguments to the shell to be used on Winows
 
@@ -102,10 +102,10 @@ A couple of requests from me when you raise an github issue.
 You can quickly open a command input box by registering the extension command to your keyboard shortcut settings. For example:
 
 ```
-  { "key": "ctrl+r ctrl+r", "command": "editWithShell.runCommand",
+  { "key": "ctrl+r ctrl+r", "command": "pipeToShell.runCommand",
                             "when": "editorTextFocus && !editorReadonly" },
 ```
 
 ## Changelog
 
-* https://github.com/ryu1kn/vscode-edit-with-shell/blob/master/CHANGELOG.md
+* https://github.com/morikko/vscode-pipe-to-shell/blob/master/CHANGELOG.md

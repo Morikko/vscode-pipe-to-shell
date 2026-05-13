@@ -1,1 +1,1 @@
-export const EXTENSION_NAME = "editWithShell";
+export const EXTENSION_NAME = "pipeToShell";

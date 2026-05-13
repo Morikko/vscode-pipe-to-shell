@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   selected
 - Persistent history with a customizable maximum size
 - Environment variables can be predefined with `env.shell` settings 
-- Add `editWithShell.quickCommand` command to use in keybinding definition. It
+- Add `pipeToShell.quickCommand` command to use in keybinding definition. It
   either accept a favorite command id or a custom shell command.
 
 ### Changed
@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Migrate from TSlint to ESlint
   - Add prettier
   - Use new vscode development setup
-- This extension is based on edit-with-shell v1.3.0
+- This extension is based on pipe-to-shell v1.3.0
 - Only add `selectedText` as an evn var when it is present in the command. If so,
   there is no stdin provided.
 

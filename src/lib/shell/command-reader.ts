@@ -185,7 +185,7 @@ export class CommandReader {
     try {
       vscode.commands.executeCommand(
         "setContext",
-        "editWithShell.CommandReaderOpen",
+        "pipeToShell.CommandReaderOpen",
         true,
       );
       return {
@@ -197,7 +197,7 @@ export class CommandReader {
     } finally {
       vscode.commands.executeCommand(
         "setContext",
-        "editWithShell.CommandReaderOpen",
+        "pipeToShell.CommandReaderOpen",
         false,
       );
     }
