@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/morikko/vscode-pipe-to-shell.svg?branch=master)](https://travis-ci.org/morikko/vscode-pipe-to-shell) [![Code Climate](https://codeclimate.com/github/morikko/vscode-pipe-to-shell/badges/gpa.svg)](https://codeclimate.com/github/morikko/vscode-pipe-to-shell)
-
 # Edit with Shell Command
 
 Leverage your favourite shell commands to edit text.
