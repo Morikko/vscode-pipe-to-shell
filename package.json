@@ -36,17 +36,17 @@
       {
         "command": "pipeToShell.clearCommandHistory",
         "title": "Clear command history",
-        "category": "EditWithShell"
+        "category": "PipeToShell"
       },
       {
         "command": "pipeToShell.runCommandInPlace",
         "title": "Run command in-place",
-        "category": "EditWithShell"
+        "category": "PipeToShell"
       },
       {
         "command": "pipeToShell.runCommandNewEditor",
         "title": "Run command to new editor",
-        "category": "EditWithShell"
+        "category": "PipeToShell"
       }
     ],
     "keybindings": [

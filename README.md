@@ -28,11 +28,11 @@ A couple of requests from me when you raise an github issue.
 
 ## Commands
 
-* `EditWithShell: Run command` (**Command ID:** `pipeToShell.runCommand`)
+* `PipeToShell: Run command` (**Command ID:** `pipeToShell.runCommand`)
 
     Show command history and let you select, modify & run a command
 
-* `EditWithShell: Clear Command History` (**Command ID:** `pipeToShell.clearCommandHistory`)
+* `PipeToShell: Clear Command History` (**Command ID:** `pipeToShell.clearCommandHistory`)
 
     Clear command history
 
