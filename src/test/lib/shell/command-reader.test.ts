@@ -80,11 +80,11 @@ describe("CommandReader", () => {
       assert.deepStrictEqual(testee.makeSuggestions(), [
         testee.makeHistorySuggestionItem("COMMAND_2"),
         testee.makeHistorySuggestionItem("COMMAND_1"),
-        testee.makeFavoriteSuggestionItem({
+        SuggestionItem.createFromFavoriteCommand({
           command: "FAVORITE_1",
           id: "my_fav_1",
         }),
-        testee.makeFavoriteSuggestionItem({
+        SuggestionItem.createFromFavoriteCommand({
           command: "FAVORITE_2",
           id: "my_fav_2",
         }),
@@ -103,13 +103,13 @@ describe("CommandReader", () => {
       await testee.init();
       assert.deepStrictEqual(testee.makeSuggestions(), [
         // instead of history
-        testee.makeFavoriteSuggestionItem({
+        SuggestionItem.createFromFavoriteCommand({
           command: "COMMAND_2",
           id: "my_fav_2",
         }),
         testee.makeHistorySuggestionItem("COMMAND_1"),
 
-        testee.makeFavoriteSuggestionItem({
+        SuggestionItem.createFromFavoriteCommand({
           command: "FAVORITE_1",
           id: "my_fav_1",
         }),
@@ -129,11 +129,11 @@ describe("CommandReader", () => {
 
       testee.toggleShowHistory();
       assert.deepStrictEqual(testee.makeSuggestions(), [
-        testee.makeFavoriteSuggestionItem({
+        SuggestionItem.createFromFavoriteCommand({
           command: "FAVORITE_1",
           id: "my_fav_1",
         }),
-        testee.makeFavoriteSuggestionItem({
+        SuggestionItem.createFromFavoriteCommand({
           command: "FAVORITE_2",
           id: "my_fav_2",
         }),
@@ -145,6 +145,23 @@ describe("CommandReader", () => {
         testee.makeHistorySuggestionItem("COMMAND_2"),
         testee.makeHistorySuggestionItem("COMMAND_1"),
       ]);
+    });
+  });
+
+  describe("SuggestionItem.createFromFavoriteCommand", () => {
+    it("prefers the name for detail or fallback to id", () => {
+      const testee_prefer_name = SuggestionItem.createFromFavoriteCommand({
+        command: "FAVORITE_1",
+        id: "my_fav_1",
+        name: "My favorite",
+      });
+      assert.strictEqual(testee_prefer_name.detail, "My favorite");
+
+      const testee_fallback_id = SuggestionItem.createFromFavoriteCommand({
+        command: "FAVORITE_1",
+        id: "my_fav_1",
+      });
+      assert.strictEqual(testee_fallback_id.detail, "my_fav_1");
     });
   });
 

@@ -15,6 +15,14 @@ export class SuggestionItem implements vscode.QuickPickItem {
     public detail: string | undefined = undefined,
     public iconPath: vscode.IconPath | undefined = undefined,
   ) {}
+
+  static createFromFavoriteCommand(fc: FavoriteCommand): SuggestionItem {
+    return new SuggestionItem(
+      fc.command,
+      fc.name || fc.id,
+      new vscode.ThemeIcon("extensions-star-full"),
+    );
+  }
 }
 
 class SaveButton implements vscode.QuickInputButton {
@@ -148,21 +156,13 @@ export class CommandReader {
     );
   }
 
-  makeFavoriteSuggestionItem(fc: FavoriteCommand): SuggestionItem {
-    return new SuggestionItem(
-      fc.command,
-      fc.id,
-      new vscode.ThemeIcon("extensions-star-full"),
-    );
-  }
-
   async init() {
     this.historySuggestions = (await this.historyStore.getAll())
       .reverse()
       .map(this.makeHistorySuggestionItem);
     this.favoriteSuggestions = this.workspaceAdapter
       .getConfig<FavoriteCommand[]>("favoriteCommands")
-      .map(this.makeFavoriteSuggestionItem);
+      .map(SuggestionItem.createFromFavoriteCommand);
     this.showHistory = true;
     this.showFavorite = true;
     this.shouldSaveCommand = true;
