@@ -23,12 +23,14 @@ describe("CommandReader", () => {
       assert.deepStrictEqual(await reader.read(false, true), {
         command: "COMMAND",
         shouldSaveCommand: true,
+        shouldProcessEntireText: false,
         shouldOpenNewEditor: false,
       });
 
       assert.deepStrictEqual(await reader.read(true, true), {
         command: "COMMAND",
         shouldSaveCommand: true,
+        shouldProcessEntireText: false,
         shouldOpenNewEditor: true,
       });
     });
@@ -48,6 +50,7 @@ describe("CommandReader", () => {
       assert.deepStrictEqual(await reader.read(false, true), {
         command: "ACTIVE_COMMAND",
         shouldSaveCommand: true,
+        shouldProcessEntireText: false,
         shouldOpenNewEditor: false,
       });
     });
@@ -150,8 +153,10 @@ describe("CommandReader", () => {
       getConfig: (key: string) => {
         if (key === "favoriteCommands") {
           return favoriteCommands;
+        } else if (key === "processEntireTextIfNoneSelected") {
+          return false;
         } else {
-          throw Error("Not defined config");
+          throw Error(`Not defined config: ${key}`);
         }
       },
     });

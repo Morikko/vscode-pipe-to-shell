@@ -28,6 +28,7 @@ describe("InputRunCommand", () => {
         Promise.resolve({
           command: "COMMAND_STRING",
           shouldOpenNewEditor: false,
+          shouldProcessEntireText: false,
           shouldSaveCommand: true,
         }),
     });
@@ -113,6 +114,7 @@ describe("InputRunCommand", () => {
         Promise.resolve({
           command: "COMMAND_STRING",
           shouldOpenNewEditor: true,
+          shouldProcessEntireText: true,
           shouldSaveCommand: true,
         }),
     });
