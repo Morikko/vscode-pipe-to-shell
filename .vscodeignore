@@ -1,11 +1,9 @@
-.codeclimate.yml
 .editorconfig
 .gitignore
 .idea/**/*
 .nvmrc
 .nyc_output/**/*
 .nycrc
-.travis.yml
 .vscode/**/*
 __*
 __*/**/*
