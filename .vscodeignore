@@ -21,3 +21,6 @@ out/test/**/*
 out/**/*.map
 tsconfig.json
 tslint.json
+.*
+eslint.config.mjs
+.github/**/*
