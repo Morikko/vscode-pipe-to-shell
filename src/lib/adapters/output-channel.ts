@@ -27,6 +27,7 @@ export class OutputChannelCommandLogger implements CommandLogger {
   ): void {
     if (this.is_config_enable(kind, name)) {
       if (content) {
+        // indent the content
         lines.push(`${name}:\n  ${content.replaceAll("\n", "\n  ")}`);
       } else {
         lines.push(`${name}: [Empty]`);
@@ -43,7 +44,10 @@ export class OutputChannelCommandLogger implements CommandLogger {
 
     lines.push("Command executed");
     if (this.is_config_enable(kind, "command")) {
-      lines.push(`${"$>"} ${entry.command}`);
+      lines.push(`$> ${entry.command}`);
+    }
+    if (entry.code) {
+      lines.push(`Exit code: ${entry.code}`);
     }
     this.logStd(lines, kind, "stdin", entry.stdin);
     this.logStd(lines, kind, "stdout", entry.stdout);

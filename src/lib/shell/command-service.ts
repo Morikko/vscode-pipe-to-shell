@@ -76,6 +76,7 @@ export class ShellCommandService {
         stdin,
         stdout: e instanceof CommandExecutionError ? e.stdout : undefined,
         stderr: e instanceof CommandExecutionError ? e.errorOutput : undefined,
+        code: e instanceof CommandExecutionError ? e.code : undefined,
         env: options.env,
         cwd: options.cwd,
         success: false,

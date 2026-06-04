@@ -3,6 +3,7 @@ export interface CommandRunLog {
   stdin: string;
   stdout?: string;
   stderr?: string;
+  code?: number;
   env: Record<string, string | undefined>;
   cwd: string;
   success: boolean;
