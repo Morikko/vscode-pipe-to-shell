@@ -51,7 +51,10 @@ describe("ShellCommandService", () => {
     when(
       spawn_child_process("SHELL_PATH", ["SHELL_ARG", "COMMAND_STRING"], any()),
     ).thenReturn(process);
-    when(processRunner.run(process, "")).thenResolve("COMMAND_OUTPUT");
+    when(processRunner.run(process, "")).thenResolve({
+      stdout: "COMMAND_OUTPUT",
+      stderr: "",
+    });
 
     const params = {
       command: "COMMAND_STRING",
@@ -67,9 +70,10 @@ describe("ShellCommandService", () => {
     when(
       spawn_child_process("SHELL_PATH", ["SHELL_ARG", "COMMAND_STRING"], any()),
     ).thenReturn(process);
-    when(processRunner.run(process, "SELECTED_TEXT")).thenResolve(
-      "COMMAND_OUTPUT_TEST_WITH_INPUT",
-    );
+    when(processRunner.run(process, "SELECTED_TEXT")).thenResolve({
+      stdout: "COMMAND_OUTPUT_TEST_WITH_INPUT",
+      stderr: "",
+    });
 
     const params = {
       command: "COMMAND_STRING",
@@ -92,7 +96,10 @@ describe("ShellCommandService", () => {
         },
       ),
     ).thenReturn(process);
-    when(processRunner.run(process, "")).thenResolve("COMMAND_OUTPUT");
+    when(processRunner.run(process, "")).thenResolve({
+      stdout: "COMMAND_OUTPUT",
+      stderr: "",
+    });
 
     const params = {
       command: "COMMAND_TEST_WITH_ENVVARS",
@@ -115,7 +122,10 @@ describe("ShellCommandService", () => {
         },
       ),
     ).thenReturn(process);
-    when(processRunner.run(process, "")).thenResolve("COMMAND_OUTPUT");
+    when(processRunner.run(process, "")).thenResolve({
+      stdout: "COMMAND_OUTPUT",
+      stderr: "",
+    });
 
     const params = {
       command: "COMMAND_TEST_WITH_selectedText_AS_ENVVAR",
@@ -135,7 +145,10 @@ describe("ShellCommandService", () => {
         contains({ cwd: "CURRENT_DIR" }),
       ),
     ).thenReturn(process);
-    when(processRunner.run(process, "")).thenResolve("COMMAND_OUTPUT");
+    when(processRunner.run(process, "")).thenResolve({
+      stdout: "COMMAND_OUTPUT",
+      stderr: "",
+    });
 
     const params = {
       command: "COMMAND_TEST_WITH_EXEC_DIR",

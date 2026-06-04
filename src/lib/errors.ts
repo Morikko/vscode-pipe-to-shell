@@ -4,6 +4,7 @@ export class CommandExecutionError extends Error {
     public readonly code: number,
     public readonly command: string,
     public readonly errorOutput: string,
+    public readonly stdout?: string,
   ) {
     super(message);
   }

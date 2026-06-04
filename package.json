@@ -175,6 +175,54 @@
           "description": "The number of executed commands save",
           "type": "integer",
           "default": 100
+        },
+        "pipeToShell.logging.success.command": {
+          "type": "boolean",
+          "default": true
+        },
+        "pipeToShell.logging.success.stdin": {
+          "type": "boolean",
+          "default": false
+        },
+        "pipeToShell.logging.success.stdout": {
+          "type": "boolean",
+          "default": false
+        },
+        "pipeToShell.logging.success.stderr": {
+          "type": "boolean",
+          "default": true
+        },
+        "pipeToShell.logging.success.env": {
+          "type": "boolean",
+          "default": false
+        },
+        "pipeToShell.logging.success.cwd": {
+          "type": "boolean",
+          "default": false
+        },
+        "pipeToShell.logging.failure.command": {
+          "type": "boolean",
+          "default": true
+        },
+        "pipeToShell.logging.failure.stdin": {
+          "type": "boolean",
+          "default": false
+        },
+        "pipeToShell.logging.failure.stdout": {
+          "type": "boolean",
+          "default": true
+        },
+        "pipeToShell.logging.failure.stderr": {
+          "type": "boolean",
+          "default": true
+        },
+        "pipeToShell.logging.failure.env": {
+          "type": "boolean",
+          "default": false
+        },
+        "pipeToShell.logging.failure.cwd": {
+          "type": "boolean",
+          "default": true
         }
       }
     }

@@ -1,8 +1,13 @@
 import { ChildProcess } from "child_process";
 import { CommandExecutionError } from "../errors";
 
+interface CommandSuccess {
+  stdout: string;
+  stderr: string;
+}
+
 export class ProcessRunner {
-  run(command: ChildProcess, inputString: string): Promise<string> {
+  run(command: ChildProcess, inputString: string): Promise<CommandSuccess> {
     let stdoutString = "";
     let stderrString = "";
 
@@ -29,13 +34,14 @@ export class ProcessRunner {
               code,
               commandString,
               stderrString.trim(),
+              stdoutString.trim(),
             ),
           );
         } else {
           if (stdoutString.endsWith("\n")) {
             stdoutString = stdoutString.slice(0, -1);
           }
-          resolve(stdoutString);
+          resolve({ stdout: stdoutString, stderr: stderrString.trim() });
         }
       });
     });

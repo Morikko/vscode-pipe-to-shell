@@ -1,4 +1,5 @@
 import { Editor } from "./adapters/editor";
+import { OutputChannelCommandLogger } from "./adapters/output-channel";
 import { ShellCommandService } from "./shell/command-service";
 import { CommandReader } from "./shell/command-reader";
 import { HistoryStore } from "./history-store";
@@ -17,6 +18,7 @@ export class AppIntegrator {
   private historyStore: HistoryStore;
   private workspaceAdapter: WorkspaceAdapter;
   private commandReader: CommandReader;
+  private commandLogger: OutputChannelCommandLogger;
 
   constructor(private context: vscode.ExtensionContext) {
     this.workspaceAdapter = new WorkspaceAdapter(vscode.workspace);
@@ -26,6 +28,11 @@ export class AppIntegrator {
       vscode.window,
       this.workspaceAdapter,
     );
+    this.commandLogger = new OutputChannelCommandLogger(
+      "Pipe to Shell",
+      this.workspaceAdapter,
+    );
+    context.subscriptions.push(this.commandLogger);
 
     this.registerPaletteCommands();
     this.registerCommandReaderCommands();
@@ -83,6 +90,7 @@ export class AppIntegrator {
       this.workspaceAdapter,
       process,
       childProcess.spawn,
+      this.commandLogger,
     );
   }
 

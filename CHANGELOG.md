@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Environment variables can be predefined with `env.shell` settings 
 - Add `pipeToShell.quickCommand` command to use in keybinding definition. It
   either accept a favorite command id or a custom shell command.
+- An `Output` panel to log the executed commands for audit or debug purposes
 
 ### Changed
 - Merge enter command and history mode

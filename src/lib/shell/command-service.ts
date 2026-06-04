@@ -1,8 +1,10 @@
 import { ProcessRunner } from "./process-runner";
 import { ShellCommandExecContext } from "./command-exec-context";
 import { ShellSettingsResolver } from "./settings-resolver";
+import { CommandLogger } from "./command-logger";
 import { ChildProcess, SpawnOptionsWithoutStdio } from "child_process";
 import { Workspace } from "../adapters/workspace";
+import { CommandExecutionError } from "../errors";
 import * as vscode from "vscode";
 
 import Process = NodeJS.Process;
@@ -28,6 +30,7 @@ export class ShellCommandService {
     workspace: Workspace,
     process: Process,
     private readonly spawn_child_process: SpawnWrapper,
+    private readonly logger?: CommandLogger,
   ) {
     this.shellCommandExecContext = new ShellCommandExecContext(workspace, {
       env: process.env,
@@ -42,19 +45,43 @@ export class ShellCommandService {
     return command.includes("selectedText");
   }
 
-  runCommand(params: CommandParams): Promise<string> {
+  async runCommand(params: CommandParams): Promise<string> {
     const options = this.getOptions(params);
     const shell = this.shellSettingsResolver.shellProgramme();
     const shellArgs = this.shellSettingsResolver.shellArgs();
+    const stdin = this.isCommandEnvSelection(params.command)
+      ? ""
+      : params.input;
     const command = this.spawn_child_process(
       shell,
       [...shellArgs, params.command],
       options,
     );
-    return this.processRunner.run(
-      command,
-      this.isCommandEnvSelection(params.command) ? "" : params.input,
-    );
+
+    try {
+      const { stdout, stderr } = await this.processRunner.run(command, stdin);
+      this.logger?.log({
+        command: params.command,
+        stdin,
+        stdout,
+        stderr,
+        env: options.env,
+        cwd: options.cwd,
+        success: true,
+      });
+      return stdout;
+    } catch (e) {
+      this.logger?.log({
+        command: params.command,
+        stdin,
+        stdout: e instanceof CommandExecutionError ? e.stdout : undefined,
+        stderr: e instanceof CommandExecutionError ? e.errorOutput : undefined,
+        env: options.env,
+        cwd: options.cwd,
+        success: false,
+      });
+      throw e;
+    }
   }
 
   private getOptions(params: CommandParams) {
