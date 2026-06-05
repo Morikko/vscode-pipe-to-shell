@@ -7,3 +7,4 @@ yarn-*.log
 *.vsix
 __*
 .vscode-test
+.continue/
