@@ -86,7 +86,11 @@ export class ShellCommandService {
   }
 
   private getOptions(params: CommandParams) {
-    const env = { ...this.shellCommandExecContext.env };
+    const env = {
+      ...this.shellCommandExecContext.env,
+      ...this.shellCommandExecContext.getFileEnvVars(params.fileUri),
+    };
+
     if (this.isCommandEnvSelection(params.command)) {
       env["selectedText"] = params.input;
     }

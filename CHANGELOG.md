@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add `pipeToShell.quickCommand` command to use in keybinding definition. It
   either accept a favorite command id or a custom shell command.
 - An `Output` panel to log the executed commands for audit or debug purposes
+- Pass env variables to the executed command about the file context:
+  - `${file}`: Absolute path to the file (if not untitled)
+  - `${fileWorkspaceFolder}`: workspace folder the file belongs (if has one)
+  - `${relativeFile}`: file path relative to fileWorkspaceFolder (if has one)
 
 ### Changed
 - Merge enter command and history mode

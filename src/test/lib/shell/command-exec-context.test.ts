@@ -91,27 +91,85 @@ describe("ShellCommandExecContext", () => {
     });
   });
 
-  function fakeWorkspaceAdapter({
-    currentDirectoryKind,
-    defaultRootPath,
-    env,
-  }: {
-    currentDirectoryKind?: "workspaceRoot" | "currentFile";
-    defaultRootPath?: string;
-    env?: { [p: string]: string };
-  } = {}): Workspace {
+  describe("getFileEnvVars", () => {
+    // Using /DIR as workspace folder so fileUri (/DIR/FILE) gives relativeFile = FILE
+    const FILE_WORKSPACE_FOLDER = "/DIR";
+
+    it("returns file, fileWorkspaceFolder and relativeFile for a file within a workspace", () => {
+      const execContext = new ShellCommandExecContext(
+        fakeWorkspaceAdapter({ rootPathForFile: FILE_WORKSPACE_FOLDER }),
+        { env: {} },
+      );
+      assert.deepStrictEqual(execContext.getFileEnvVars(fileUri), {
+        file: "/DIR/FILE",
+        fileWorkspaceFolder: "/DIR",
+        relativeFile: "FILE",
+      });
+    });
+
+    it("returns only file when the file is not part of workspace folder", () => {
+      const execContext = new ShellCommandExecContext(
+        fakeWorkspaceAdapter({
+          rootPathForFile: undefined,
+          defaultRootPath: FILE_WORKSPACE_FOLDER,
+        }),
+        { env: {} },
+      );
+      // relativeFile is omitted — it can't be computed without a real workspace folder
+      assert.deepStrictEqual(execContext.getFileEnvVars(fileUri), {
+        file: "/DIR/FILE",
+      });
+    });
+
+    it("returns only file when there is no workspace folder at all", () => {
+      const execContext = new ShellCommandExecContext(
+        fakeWorkspaceAdapter({ rootPathForFile: undefined }),
+        { env: {} },
+      );
+      assert.deepStrictEqual(execContext.getFileEnvVars(fileUri), {
+        file: "/DIR/FILE",
+      });
+    });
+
+    it("returns empty object for non-file URIs like untitled", () => {
+      const execContext = new ShellCommandExecContext(fakeWorkspaceAdapter(), {
+        env: {},
+      });
+      assert.deepStrictEqual(execContext.getFileEnvVars(untitledUri), {});
+    });
+  });
+
+  /**
+   * Omit "rootPathForFile" to default to WORKSPACE_ROOT. Pass undefined
+   * explicitly to simulate no workspace folder.
+   *
+   * @param options
+   * @returns
+   */
+  function fakeWorkspaceAdapter(
+    options: {
+      currentDirectoryKind?: "workspaceRoot" | "currentFile";
+      defaultRootPath?: string;
+      rootPathForFile?: string;
+      env?: { [p: string]: string };
+    } = {},
+  ): Workspace {
+    // Distinguish "not provided" (use WORKSPACE_ROOT) from "explicitly
+    // undefined" (no folder).
+    const rootPathForFile =
+      "rootPathForFile" in options ? options.rootPathForFile : WORKSPACE_ROOT;
     const workspace = mockMethods<Workspace>([
       "getConfig",
       "getRootPathFor",
       "getDefaultRootPath",
     ]);
     when(workspace.getConfig("currentDirectoryKind")).thenReturn(
-      currentDirectoryKind,
+      options.currentDirectoryKind,
     );
-    when(workspace.getConfig("shell.env")).thenReturn(env);
-    when(workspace.getRootPathFor(fileUri)).thenReturn(WORKSPACE_ROOT);
+    when(workspace.getConfig("shell.env")).thenReturn(options.env);
+    when(workspace.getRootPathFor(fileUri)).thenReturn(rootPathForFile);
     when(workspace.getRootPathFor(untitledUri)).thenReturn(undefined);
-    when(workspace.getDefaultRootPath()).thenReturn(defaultRootPath);
+    when(workspace.getDefaultRootPath()).thenReturn(options.defaultRootPath);
     return workspace;
   }
 });

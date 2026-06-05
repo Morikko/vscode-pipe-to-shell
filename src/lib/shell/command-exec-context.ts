@@ -1,5 +1,5 @@
 import { Workspace } from "../adapters/workspace";
-import { dirname } from "path";
+import { dirname, relative } from "path";
 import * as os from "os";
 import * as vscode from "vscode";
 
@@ -22,6 +22,32 @@ export class ShellCommandExecContext {
     return {
       ...this.process.env,
       ...this.workspaceAdapter.getConfig<{ [p: string]: string }>("shell.env"),
+    };
+  }
+
+  /**
+   * Returns VS Code-style predefined variables as env vars for a given file URI:
+   *   file               — absolute path to the file (${file})
+   *   fileWorkspaceFolder — workspace folder the file belongs to (${fileWorkspaceFolder})
+   *   relativeFile       — file path relative to fileWorkspaceFolder (${relativeFile})
+   *
+   * Returns an empty object for non-file URIs (e.g. untitled).
+   */
+  getFileEnvVars(fileUri: vscode.Uri): { [key: string]: string } {
+    if (fileUri.scheme !== "file") {
+      return {};
+    }
+
+    const file = fileUri.fsPath;
+    const workspaceFolder = this.workspaceAdapter.getRootPathFor(fileUri);
+    if (!workspaceFolder) {
+      return { file };
+    }
+
+    return {
+      file,
+      fileWorkspaceFolder: workspaceFolder,
+      relativeFile: relative(workspaceFolder, file),
     };
   }
 
