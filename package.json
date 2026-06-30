@@ -5,7 +5,7 @@
   "version": "0.1.0-beta.2",
   "publisher": "morikko",
   "license": "SEE LICENSE IN LICENSE.txt",
-  "icon": "images/pipe-to-shell-v2.png",
+  "icon": "images/pipe-to-shell-v4.png",
   "bugs": {
     "url": "https://github.com/morikko/vscode-pipe-to-shell/issues"
   },

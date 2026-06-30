@@ -42,8 +42,8 @@ Command IDs: `pipeToShell.runCommandInPlace` /
 By clicking the `OK` button or pressing <kbd>Enter</kbd>, the entered command is
 run. 
 
-The suggestions are made of the previous run commands (marked with ![history-icon](./images/icons/history.png)) and the favorite commands
-(marked with ![star-icon](./images/icons/star.png)).
+The suggestions are made of the previous run commands (marked with ![history-icon](https://raw.githubusercontent.com/morikko/vscode-pipe-to-shell/master/images/icons/history.png)) and the favorite commands
+(marked with ![star-icon](https://raw.githubusercontent.com/morikko/vscode-pipe-to-shell/master/images/icons/star.png)).
 
 By clicking or pressing <kbd>Space</kbd> on a suggestion, the command is set in the prompt to be further modified.
 
@@ -51,14 +51,14 @@ By pressing <kbd>Enter</kbd> on a suggestion, that command is run immediately.
 
 By default all suggestions are shown but it is possible to customize it with the
 buttons at the top:
-- ![history-icon](./images/icons/history.png): Hide/Show history suggestions (Ctrl+H)
-- ![star-icon](./images/icons/star.png): Hide/Show favorite suggestions (Ctrl+F)
+- ![history-icon](https://raw.githubusercontent.com/morikko/vscode-pipe-to-shell/master/images/icons/history.png): Hide/Show history suggestions (Ctrl+H)
+- ![star-icon](https://raw.githubusercontent.com/morikko/vscode-pipe-to-shell/master/images/icons/star.png): Hide/Show favorite suggestions (Ctrl+F)
 
 It is also possible to customize the execution:
 
-- ![new-icon](./images/icons/new.png): Change target In-place/New-editor (Ctrl+N). The default value is based on the command run.
-- ![save-icon](./images/icons/save.png): Save the command in history (Ctrl+S)
-- ![selection-icon](./images/icons/selection.png): When selected process file content if no text is selected (Ctrl+G)
+- ![new-icon](https://raw.githubusercontent.com/morikko/vscode-pipe-to-shell/master/images/icons/new.png): Change target In-place/New-editor (Ctrl+N). The default value is based on the command run.
+- ![save-icon](https://raw.githubusercontent.com/morikko/vscode-pipe-to-shell/master/images/icons/save.png): Save the command in history (Ctrl+S)
+- ![selection-icon](https://raw.githubusercontent.com/morikko/vscode-pipe-to-shell/master/images/icons/selection.png): When selected process file content if no text is selected (Ctrl+G)
   
   The initial value is defined by `pipeToShell.processEntireTextIfNoneSelected`
   configuration
