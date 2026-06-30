@@ -1,8 +1,8 @@
 {
   "name": "pipe-to-shell",
-  "displayName": "Pipe to Shell Command",
+  "displayName": "Pipe to Shell",
   "description": "Leverage your favourite shell commands to edit text",
-  "version": "0.1.0",
+  "version": "0.1.0-beta.1",
   "publisher": "morikko",
   "license": "SEE LICENSE IN LICENSE.txt",
   "icon": "images/pipe-to-shell.png",
@@ -27,7 +27,8 @@
   ],
   "activationEvents": [
     "onCommand:pipeToShell.clearCommandHistory",
-    "onCommand:pipeToShell.runCommand",
+    "onCommand:pipeToShell.runCommandInPlace",
+    "onCommand:pipeToShell.runCommandNewEditor",
     "onCommand:pipeToShell.quickCommand"
   ],
   "main": "./out/extension.js",
