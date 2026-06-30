@@ -2,10 +2,10 @@
   "name": "pipe-to-shell",
   "displayName": "Pipe to Shell",
   "description": "Leverage your favourite shell commands to edit text",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "publisher": "morikko",
   "license": "SEE LICENSE IN LICENSE.txt",
-  "icon": "images/pipe-to-shell.png",
+  "icon": "images/pipe-to-shell-v2.png",
   "bugs": {
     "url": "https://github.com/morikko/vscode-pipe-to-shell/issues"
   },
