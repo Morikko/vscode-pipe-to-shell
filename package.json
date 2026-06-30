@@ -78,7 +78,7 @@
     ],
     "configuration": {
       "type": "object",
-      "title": "Edit with Shell Command configurations",
+      "title": "Pipe to Shell configurations",
       "properties": {
         "pipeToShell.currentDirectoryKind": {
           "description": "Current directory for shell commands",
