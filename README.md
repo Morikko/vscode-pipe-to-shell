@@ -24,11 +24,11 @@ Leverage your favourite shell commands to edit text.
 * Highly configurable: shell preference, env vars and many more
 * Support multi cursors
 
-![Pipe to Shell](https://raw.githubusercontent.com/morikko/vscode-pipe-to-shell/master/images/animations/public.gif)
+![Pipe to Shell edit demo](https://raw.githubusercontent.com/morikko/vscode-pipe-to-shell/master/images/animations/demo_edit.gif)
 
-![Insert command output](https://raw.githubusercontent.com/morikko/vscode-pipe-to-shell/master/images/animations/insert-command-output.gif)
+![Insert command output demo](https://raw.githubusercontent.com/morikko/vscode-pipe-to-shell/master/images/animations/demo_insert.gif)
 
-![Edit and reuse past commands](https://raw.githubusercontent.com/morikko/vscode-pipe-to-shell/master/images/animations/edit-and-run-command-history.gif)
+![Edit and reuse past commands demo](https://raw.githubusercontent.com/morikko/vscode-pipe-to-shell/master/images/animations/demo_suggestions_options.gif)
 
 # Enter a command
 
