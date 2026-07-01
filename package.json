@@ -2,7 +2,7 @@
   "name": "pipe-to-shell",
   "displayName": "Pipe to Shell",
   "description": "Leverage your favourite shell commands to edit text",
-  "version": "0.1.0-beta.2",
+  "version": "0.1.0",
   "publisher": "morikko",
   "license": "SEE LICENSE IN LICENSE.txt",
   "icon": "images/pipe-to-shell-v4.png",
